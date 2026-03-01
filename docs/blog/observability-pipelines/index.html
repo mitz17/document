@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja-jp" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="OpenTelemetry Collector を用いたオブザーバビリティ・パイプラインの設計と運用ポイント">
+<title>Observability パイプライン構築ガイド</title>
+
+
+<link rel="canonical" href="https://example.org/blog/observability-pipelines/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.51bbf1ce24f77edff532a0abed84dd20364a30771816f60306d916a1f2e70719.css"><meta property='og:title' content="Observability パイプライン構築ガイド">
+<meta property='og:description' content="OpenTelemetry Collector を用いたオブザーバビリティ・パイプラインの設計と運用ポイント">
+<meta property='og:url' content='https://example.org/blog/observability-pipelines/'>
+<meta property='og:site_name' content='もざぶれなるままに'>
+<meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='オブザーバビリティ' /><meta property='article:tag' content='OpenTelemetry' /><meta property='article:tag' content='SRE' /><meta property='article:published_time' content='2026-02-27T10:33:52&#43;09:00'/><meta property='article:modified_time' content='2026-02-27T10:33:52&#43;09:00'/>
+<meta name="twitter:title" content="Observability パイプライン構築ガイド">
+<meta name="twitter:description" content="OpenTelemetry Collector を用いたオブザーバビリティ・パイプラインの設計と運用ポイント">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">もざぶれなるままに</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                <span>ホーム</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                <span>記事一覧</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                <span>プロフィール</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/contact/' >
+                
+                <span>お問い合わせ</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/privacy/' >
+                
+                <span>プライバシーポリシー</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>ダークモード</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/sre/" style="background-color: hsl(103, 60%, 84%); color: hsl(103, 60%, 15%);">
+                SRE
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/blog/observability-pipelines/">Observability パイプライン構築ガイド</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            OpenTelemetry Collector を用いたオブザーバビリティ・パイプラインの設計と運用ポイント
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2026-02-27T10:33:52&#43;09:00'>2026年2月27日金曜日</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <h2 id="なぜパイプラインが必要なのか">なぜパイプラインが必要なのか
+</h2><p>クラウド化とマイクロサービス化に伴い、各サービスはメトリクス・ログ・トレースを膨大に生成します。ツールごとにエージェントを配置していると、</p>
+<ul>
+<li>収集経路が乱立し障害点が特定しづらい</li>
+<li>ライセンス課金の上昇（特にログ）</li>
+<li>収集フォーマットが統一されずデータの再利用が難しい</li>
+</ul>
+<p>といった問題が顕在化します。OpenTelemetry Collector を中心にした observability pipeline を構築すると、収集〜整形〜配信の制御を1箇所に集約できます。</p>
+<h2 id="最小構成のアーキテクチャ">最小構成のアーキテクチャ
+</h2><pre tabindex="0"><code>[App] --(OTLP/HTTP)--&gt; [Agent Collector] --(OTLP/gRPC)--&gt; [Gateway Collector] -- fan-out --&gt; [Datadog][Grafana LGTM][S3]
+</code></pre><ul>
+<li><strong>Agent Collector</strong>: 各ノードにデプロイし、アプリ側の exporter と密結合を避ける。</li>
+<li><strong>Gateway Collector</strong>: VPC 内の1〜数台で受け口を集約し、キューやバッファを持たせる。</li>
+<li><strong>Backend</strong>: SaaS/APM + OSS (Loki, Tempo など) を用途別に使い分ける。</li>
+</ul>
+<h2 id="opentelemetry-collector-の設定例">OpenTelemetry Collector の設定例
+</h2><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">receivers</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">otlp</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">protocols</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">http</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">grpc</span>:
+</span></span><span style="display:flex;"><span><span style="color:#f92672">processors</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">batch</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">memory_limiter</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">check_interval</span>: <span style="color:#ae81ff">5s</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">limit_mib</span>: <span style="color:#ae81ff">512</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">attributes</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">actions</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">key</span>: <span style="color:#ae81ff">environment</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">value</span>: <span style="color:#ae81ff">prod</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">action</span>: <span style="color:#ae81ff">upsert</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">exporters</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">loki</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">endpoint</span>: <span style="color:#ae81ff">https://logs.example.com/loki/api/v1/push</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">otlp/datadog</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">endpoint</span>: <span style="color:#ae81ff">https://api.datadoghq.com</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">headers</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">DD-API-KEY</span>: <span style="color:#ae81ff">${DATADOG_API_KEY}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">service</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">pipelines</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">logs</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">receivers</span>: [<span style="color:#ae81ff">otlp]</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">processors</span>: [<span style="color:#ae81ff">memory_limiter, batch, attributes]</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">exporters</span>: [<span style="color:#ae81ff">loki, otlp/datadog]</span>
+</span></span></code></pre></div><p>上記の <code>attributes</code> プロセッサで環境タグを付与しておくと、ダッシュボードのフィルタリングが容易になります。<code>memory_limiter</code> は Collector 自体の OOM を防ぐので、本番では必須です。</p>
+<h2 id="運用時の観点">運用時の観点
+</h2><ol>
+<li><strong>バックプレッシャー制御</strong>: エクスポーターごとにリトライやキュー長の上限を設定し、停止時のロストを最小化します。</li>
+<li><strong>スキーマ互換性</strong>: OpenTelemetry Schema 1.0 以降でフィールド名が変わるケースがあるので、<code>otelcol --version</code> と schema URL を定期的に確認します。</li>
+<li><strong>コストガードレール</strong>: ログの sampling を Collector 側で実装し、一定以上のトラフィックが来た場合は重要タグを含むものだけを通すなど安全装置を持たせます。</li>
+<li><strong>構成のテスト自動化</strong>: Collector の設定は単なる YAML なので、<code>otelcol --config config.yaml --dry-run</code> を CI で回すと人為的な typo を早期に検知できます。</li>
+</ol>
+<h2 id="データ品質向上の-tips">データ品質向上の Tips
+</h2><ul>
+<li><strong>Semantic Conventions の準拠</strong>: HTTP サービスなら <code>http.method</code>, <code>http.route</code> など必須属性を埋めることで、可視化ツール側の自動集計が機能します。</li>
+<li><strong>メタデータの enrich</strong>: デプロイ情報（Git SHA、k8s namespace）を Collector 側で付与すると、アプリ改修との相関が取りやすい。</li>
+<li><strong>PII 対策</strong>: <code>filter</code> プロセッサで個人情報をマスキングし、誤送信を防ぐ。</li>
+</ul>
+<h2 id="まとめ">まとめ
+</h2><p>Observability pipeline は単にテレメトリデータを転送する装置ではなく、SLO を守るための制御点です。Collector を中心に据えた構成であれば、</p>
+<ul>
+<li>データの正規化</li>
+<li>コスト最適化</li>
+<li>配信先の抽象化</li>
+</ul>
+<p>を同時に実現できます。まずはステージングで Collector を 1 本立て、既存の APM からのルーティングを段階的に切り替えるところから始めてみてください。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E3%82%AA%E3%83%96%E3%82%B6%E3%83%BC%E3%83%90%E3%83%93%E3%83%AA%E3%83%86%E3%82%A3/">オブザーバビリティ</a>
+        
+            <a href="/tags/opentelemetry/">OpenTelemetry</a>
+        
+            <a href="/tags/sre/">SRE</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+        <div class="disqus-container">
+    
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 もざぶれなるままに
+    </section>
+    
+    <section class="powerby">
+        <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
+        テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>
