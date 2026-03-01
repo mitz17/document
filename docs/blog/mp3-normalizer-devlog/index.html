@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja-jp" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Tkinter/ffmpeg を束ねた LUFS 正規化ツール「mp3-normalizer」の開発背景と実装ポイントを解説">
+<title>mp3-normalizer 開発ログ</title>
+
+
+<link rel="canonical" href="https://example.org/blog/mp3-normalizer-devlog/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.51bbf1ce24f77edff532a0abed84dd20364a30771816f60306d916a1f2e70719.css"><meta property='og:title' content="mp3-normalizer 開発ログ">
+<meta property='og:description' content="Tkinter/ffmpeg を束ねた LUFS 正規化ツール「mp3-normalizer」の開発背景と実装ポイントを解説">
+<meta property='og:url' content='https://example.org/blog/mp3-normalizer-devlog/'>
+<meta property='og:site_name' content='もざぶれなるままに'>
+<meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='Python' /><meta property='article:tag' content='Tkinter' /><meta property='article:tag' content='ffmpeg' /><meta property='article:tag' content='LUFS' /><meta property='article:published_time' content='2026-02-20T10:00:00&#43;09:00'/><meta property='article:modified_time' content='2026-02-20T10:00:00&#43;09:00'/>
+<meta name="twitter:title" content="mp3-normalizer 開発ログ">
+<meta name="twitter:description" content="Tkinter/ffmpeg を束ねた LUFS 正規化ツール「mp3-normalizer」の開発背景と実装ポイントを解説">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">もざぶれなるままに</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                <span>ホーム</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                <span>記事一覧</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                <span>プロフィール</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/contact/' >
+                
+                <span>お問い合わせ</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/privacy/' >
+                
+                <span>プライバシーポリシー</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>ダークモード</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88/" style="background-color: hsl(342, 60%, 84%); color: hsl(342, 60%, 15%);">
+                プロジェクト
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/blog/mp3-normalizer-devlog/">mp3-normalizer 開発ログ</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            Tkinter/ffmpeg を束ねた LUFS 正規化ツール「mp3-normalizer」の開発背景と実装ポイントを解説
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2026-02-20T10:00:00&#43;09:00'>2026年2月20日金曜日</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <p>GitHub: <a class="link" href="https://github.com/mitz17/mp3-normalizer"  target="_blank" rel="noopener"
+    >mitz17/mp3-normalizer</a></p>
+<h2 id="背景">背景
+</h2><p>10 年くらい前に作った mp3 をふと再生したら「え、なんか音ちいさくない？」となりました。コピペの荒波に飲まれてビットレートが劣化したのかと疑ったものの、音質自体は悪くなっていない。つまりファイルそのものはまだ元気だけれど、音声レベルが不揃いなままだと今後も安心して使えない──そう実感したのがこのツールを作るきっかけでした。</p>
+<h2 id="対象読者">対象読者
+</h2><ul>
+<li>古い mp3 アーカイブを今も大切にしていて、音量だけさっと手直ししたい人</li>
+<li><code>ffmpeg</code> の呪文を暗記していないけど、まとめて正規化したい人</li>
+<li>エンジニアと非エンジニアが同じツールで音源を管理したいチーム</li>
+</ul>
+<h2 id="前提python-と-mp3">前提（Python と mp3）
+</h2><ul>
+<li>Python 3.11 以上 + ffmpeg 6.x が動作する環境が存在していること。ffmpeg の導入は <a class="link" href="https://qiita.com/Tadataka_Takahashi/items/9dcb0cf308db6f5dc31b"  target="_blank" rel="noopener"
+    >この Qiita 記事</a> を参考にして OS ごとの手順を順番にたどれば OK。</li>
+<li>正規化したい <code>.mp3</code> をフォルダごと用意しておき、WAV などは事前に変換しておく。</li>
+</ul>
+<h2 id="環境">環境
+</h2><ul>
+<li>OS: Windows 11（PowerShell）で動作確認済み</li>
+<li>Python: 3.11.7（<code>python -m venv .venv</code> 推奨）</li>
+<li>ffmpeg: 6.1 系（<code>ffmpeg -version</code> で確認）</li>
+<li>GUI: Tkinter + ttk を素朴に使用</li>
+</ul>
+<h2 id="ゴール">ゴール
+</h2><ul>
+<li>OS を問わず、誰でも同じ LUFS 正規化フローを踏める</li>
+<li>GUI でも CLI でも結果が揃い、履歴とログで説明責任を果たせる</li>
+<li>「入力フォルダを置き換えたら音が揃う」を日常運用に落とし込む</li>
+</ul>
+<h2 id="プロジェクトの概要">プロジェクトの概要
+</h2><ul>
+<li>Python 3.11 + ffmpeg 6.x の軽量構成</li>
+<li>GUI/CLI 共通のエンジン (<code>processor.py</code>) と再利用しやすいユーティリティ (<code>utils.py</code>)</li>
+<li><code>processed_history.json</code> で二重実行を抑止し、<code>mp3_normalizer.log</code> で証跡を残す</li>
+<li><code>loudnorm</code> 1pass を使い、-14 LUFS / -1 dBFS をデフォルトターゲットに設定</li>
+</ul>
+<h2 id="どんな課題を解いているのか">どんな課題を解いているのか
+</h2><ul>
+<li>古いファイルでも音質は十分なので、音量だけ揃えればまだまだ使える</li>
+<li><code>ffmpeg</code> のコマンドを忘れても GUI のプルダウンで完結する</li>
+<li>いつどのファイルを処理したかがログで追えるので、再録や差し戻しが怖くない</li>
+</ul>
+<h2 id="セットアップの流れ">セットアップの流れ
+</h2><ol>
+<li><code>git clone https://github.com/mitz17/mp3-normalizer</code> でソースを取得</li>
+<li><code>python -m venv .venv &amp;&amp; source .venv/bin/activate</code>（Windows は <code>Activate.ps1</code>）</li>
+<li><code>pip install -r requirements.txt</code> で依存をインストール</li>
+<li><code>python main.py</code> で GUI、<code>python main.py --cli ...</code> でバッチ処理を実行</li>
+<li>出力ディレクトリに並んだ MP3 を聴き比べ、ログファイルで値を確認</li>
+</ol>
+<h2 id="アーキテクチャと実装メモ">アーキテクチャと実装メモ
+</h2><ul>
+<li><code>gui.py</code> は Tkinter の <code>Frame</code> を積み上げ、別スレッドで ffmpeg を呼び出し UI フリーズを回避</li>
+<li><code>processor.py</code> は <code>Path.rglob('*.mp3')</code> で対象を探し、衝突しそうなファイルは <code>_1</code>, <code>_2</code> とサフィックスを付加</li>
+<li><code>-map_metadata 0</code> で ID3 タグを保ったまま再エンコード</li>
+<li>ログはプレーンテキストに連ね、LUFS 値や実行コマンドを丸ごと保存</li>
+</ul>
+<h2 id="gui-の操作感">GUI の操作感
+</h2><ol>
+<li>入力・出力ディレクトリを指定すると、対象 MP3 がリストでずらっと表示されます。</li>
+<li>LUFS と True Peak を入力。迷ったらデフォルト（-14 / -1）のままで OK。</li>
+<li>再帰チェックや再エンコード強制のトグルで挙動を調整。</li>
+<li>「実行」を押すと進捗ログが流れ、完了すると結果をスクロールなしで確認できます。</li>
+</ol>
+<p><img src="/images/mp3-normalizer-gui.png" alt="mp3-normalizer GUI モックアップ" loading="lazy" style="border-radius:16px; box-shadow:0 8px 24px rgba(15,23,42,0.18);"></p>
+
+    <blockquote>
+        <p>GUI 全体をざっくり再現したモック。入力/出力、ターゲット LUFS、対象ファイル、ログまで 1 画面で見渡せます。</p>
+
+    </blockquote>
+<h2 id="cli-の使いどころ">CLI の使いどころ
+</h2><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python main.py --cli --input ./old_mp3 --output ./normalized   --lufs -15.0 --true-peak -1.0 --force
+</span></span></code></pre></div><p>CI/CD やタスクスケジューラから呼び出すならこちら。終了コード 0/1/2 で「成功/入力エラー/部分失敗」を判定でき、<code>--force</code> で履歴を無視して再実行することも可能です。</p>
+<h2 id="まとめ">まとめ
+</h2><ul>
+<li>Tkinter × ffmpeg という素朴な構成でも、音量正規化の面倒くささはかなり解消できる</li>
+<li>古い mp3 をまだまだ使いたい人は、ぜひ <code>mp3-normalizer</code> をクローンして遊んでみてください！</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/python/">Python</a>
+        
+            <a href="/tags/tkinter/">Tkinter</a>
+        
+            <a href="/tags/ffmpeg/">Ffmpeg</a>
+        
+            <a href="/tags/lufs/">LUFS</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+        <div class="disqus-container">
+    
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 もざぶれなるままに
+    </section>
+    
+    <section class="powerby">
+        <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
+        テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>
