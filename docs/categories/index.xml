@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Categories on もざぶれなるままに</title>
-        <link>https://example.org/categories/</link>
+        <link>http://localhost:1313/categories/</link>
         <description>Recent content in Categories on もざぶれなるままに</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>ja-jp</language>
-        <lastBuildDate>Sun, 01 Mar 2026 11:17:14 +0900</lastBuildDate><atom:link href="https://example.org/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Mon, 02 Mar 2026 00:00:00 +0900</lastBuildDate><atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>プロジェクト</title>
+            <link>http://localhost:1313/categories/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88/</link>
+            <pubDate>Mon, 02 Mar 2026 00:00:00 +0900</pubDate>
+            <guid>http://localhost:1313/categories/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88/</guid>
+            <description></description>
+        </item><item>
             <title>お知らせ</title>
-            <link>https://example.org/categories/%E3%81%8A%E7%9F%A5%E3%82%89%E3%81%9B/</link>
+            <link>http://localhost:1313/categories/%E3%81%8A%E7%9F%A5%E3%82%89%E3%81%9B/</link>
             <pubDate>Sun, 01 Mar 2026 11:17:14 +0900</pubDate>
-            <guid>https://example.org/categories/%E3%81%8A%E7%9F%A5%E3%82%89%E3%81%9B/</guid>
+            <guid>http://localhost:1313/categories/%E3%81%8A%E7%9F%A5%E3%82%89%E3%81%9B/</guid>
             <description></description>
         </item></channel>
 </rss>
