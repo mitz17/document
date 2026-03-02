@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ja-jp" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Cloudflare Email Routing と Gmail を使って無料で独自ドメインのメールを受信したい">
+<title>Cloudflare Email Routingで独自ドメインのメールを受信する</title>
+
+
+<link rel="canonical" href="https://mitz17.com/blog/receive-email/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.51bbf1ce24f77edff532a0abed84dd20364a30771816f60306d916a1f2e70719.css"><meta property='og:title' content="Cloudflare Email Routingで独自ドメインのメールを受信する">
+<meta property='og:description' content="Cloudflare Email Routing と Gmail を使って無料で独自ドメインのメールを受信したい">
+<meta property='og:url' content='https://mitz17.com/blog/receive-email/'>
+<meta property='og:site_name' content='もざぶれなるままに'>
+<meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='Cloudflare' /><meta property='article:tag' content='メール' /><meta property='article:tag' content='ノーコード' /><meta property='article:published_time' content='2026-03-02T12:00:00&#43;09:00'/><meta property='article:modified_time' content='2026-03-02T12:00:00&#43;09:00'/>
+<meta name="twitter:title" content="Cloudflare Email Routingで独自ドメインのメールを受信する">
+<meta name="twitter:description" content="Cloudflare Email Routing と Gmail を使って無料で独自ドメインのメールを受信したい">
+    <link rel="shortcut icon" href="/images/favicon.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">もざぶれなるままに</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                <span>ホーム</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                <span>記事一覧</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/about/' >
+                
+                <span>プロフィール</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/contact/' >
+                
+                <span>お問い合わせ</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/privacy/' >
+                
+                <span>プライバシーポリシー</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>ダークモード</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88/" style="background-color: hsl(342, 60%, 84%); color: hsl(342, 60%, 15%);">
+                プロジェクト
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/blog/receive-email/">Cloudflare Email Routingで独自ドメインのメールを受信する</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            Cloudflare Email Routing と Gmail を使って無料で独自ドメインのメールを受信したい
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2026-03-02T12:00:00&#43;09:00'>2026年3月2日月曜日</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <h2 id="この記事でやること">この記事でやること
+</h2><p>独自ドメイン <code>mitz17.com</code> で メールアドレスを作り、Cloudflare Email Routing を使って Gmail へ無料で転送。サーバー構築なし、ほぼノーコードで完結した。</p>
+<h2 id="参考にした資料">参考にした資料
+</h2><ul>
+<li><a class="link" href="https://note.com/yetanother_yk/n/ncdbb530e1cc5"  target="_blank" rel="noopener"
+    >CloudflareのEmail Routingでカスタムドメイン宛メールを受信する手順</a></li>
+</ul>
+<h2 id="操作1-cloudflare-でドメインの管理画面を表示">操作1: Cloudflare でドメインの管理画面を表示
+</h2><h3 id="手順">手順
+</h3><ol>
+<li>Cloudflare にログイン。</li>
+<li>対象ドメイン（今回は <code>mitz17.com</code>）を選択。</li>
+</ol>
+<p><img src="/blog/receive-email/domain-dashboard.png"
+	width="688"
+	height="631"
+	loading="lazy"
+	
+		alt="ドメインのダッシュボード"
+	
+    
+        title="Cloudflare でドメインの管理画面"
+        data-title-escaped="Cloudflare でドメインの管理画面"
+    
+	
+		class="gallery-image" 
+		data-flex-grow="109"
+		data-flex-basis="261px"
+	
+></p>
+<h2 id="操作2-開始ボタンを押す">操作2: 開始ボタンを押す
+</h2><h3 id="手順-1">手順
+</h3><ol>
+<li>左メニューの「メールアドレス」→「Email Routing」を開く。</li>
+<li>「開始」をクリック。</li>
+</ol>
+<p><img src="/blog/receive-email/email-routing-rule.png"
+	width="689"
+	height="632"
+	loading="lazy"
+	
+		alt="転送ルールの設定"
+	
+    
+	
+		class="gallery-image" 
+		data-flex-grow="109"
+		data-flex-basis="261px"
+	
+></p>
+<h2 id="操作3-アドレスの設定">操作3: アドレスの設定
+</h2><h3 id="手順-2">手順
+</h3><ol>
+<li>「カスタムアドレス」に好きなメールアドレスを入力<br>
+（例: <code>mitz17@mitz17.com</code>）</li>
+<li>「宛先」に転送したい Gmail アドレスを入力</li>
+<li>「作成して続行」をクリック</li>
+</ol>
+<p>すると Gmail に確認メールが届く。</p>
+<p>メール内の <strong>&ldquo;Verify email address&rdquo;</strong> をクリックすれば認証完了。</p>
+<p>だいたい数分待てば設定が反映される。</p>
+<p><img src="/blog/receive-email/email-routing-setup.png"
+	width="778"
+	height="720"
+	loading="lazy"
+	
+		alt="Email Routing のセットアップウィザード"
+	
+    
+	
+		class="gallery-image" 
+		data-flex-grow="108"
+		data-flex-basis="259px"
+	
+></p>
+<h2 id="操作4-受信テスト">操作4: 受信テスト
+</h2><h3 id="手順-3">手順
+</h3><p>外部アドレスからテストメールを送る。</p>
+<p>Gmailに届けば成功。</p>
+<p>届かない場合は：</p>
+<ul>
+<li>MXレコードが間違っている</li>
+<li>まだDNSが反映されていない</li>
+<li>認証が終わっていない</li>
+</ul>
+<p>このあたりをチェック。</p>
+<p><img src="/blog/receive-email/routing-checklist.png"
+	width="1120"
+	height="428"
+	loading="lazy"
+	
+		alt="最終チェックリスト"
+	
+    
+        title="届いたぜ！"
+        data-title-escaped="届いたぜ！"
+    
+	
+		class="gallery-image" 
+		data-flex-grow="261"
+		data-flex-basis="628px"
+	
+></p>
+<h2 id="まとめ">まとめ
+</h2><p>Cloudflare Email Routing と Gmail で自分のドメインのメールを受け取れるようになりました。</p>
+<p>受信は簡単。</p>
+<p>問題は「送信側」。(らしい)</p>
+<p>SendGrid の無料プランがサ終したそうなので、<br>
+Mailgun か AWS SES あたりを検討中。</p>
+<p>次は送信環境を作る。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/cloudflare/">Cloudflare</a>
+        
+            <a href="/tags/%E3%83%A1%E3%83%BC%E3%83%AB/">メール</a>
+        
+            <a href="/tags/%E3%83%8E%E3%83%BC%E3%82%B3%E3%83%BC%E3%83%89/">ノーコード</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+        <div class="disqus-container">
+    
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 もざぶれなるままに
+    </section>
+    
+    <section class="powerby">
+        <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
+        テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>
