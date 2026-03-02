@@ -209,7 +209,6 @@
 </h2><ul>
 <li>古い mp3 アーカイブを今も大切にしていて、音量だけさっと手直ししたい人</li>
 <li><code>ffmpeg</code> の呪文を暗記していないけど、まとめて正規化したい人</li>
-<li>エンジニアと非エンジニアが同じツールで音源を管理したいチーム</li>
 </ul>
 <h2 id="前提python-と-mp3">前提（Python と mp3）
 </h2><ul>
@@ -217,6 +216,8 @@
     >この Qiita 記事</a> を参考にして OS ごとの手順を順番にたどれば OK。</li>
 <li>正規化したい <code>.mp3</code> をフォルダごと用意しておき、WAV などは事前に変換しておく。</li>
 </ul>
+<h2 id="ffmpeg-とは">ffmpeg とは？
+</h2><p>映像・音声を扱う OSS の名作で、CLI から形式変換やトリミング、ノーマライズを一気に処理できます。<code>mp3-normalizer</code> では ffmpeg の <code>loudnorm</code> フィルタを呼び出して LUFS を調整していますが、コマンド一発で WAV/MP3/MP4 などほぼすべてのメディアを扱える万能ツールです。GUI から触るときも裏側ではこのコマンドが動いており、パラメータを変えれば True Peak の上限やターゲット LUFS を柔軟に切り替えられます。</p>
 <h2 id="環境">環境
 </h2><ul>
 <li>OS: Windows 11（PowerShell）で動作確認済み</li>
@@ -258,6 +259,41 @@
 <li><code>-map_metadata 0</code> で ID3 タグを保ったまま再エンコード</li>
 <li>ログはプレーンテキストに連ね、LUFS 値や実行コマンドを丸ごと保存</li>
 </ul>
+<h2 id="コードのざっくり解説">コードのざっくり解説
+</h2><p><code>processor.py</code> の <code>AudioProcessor.process_directory</code> では、入力ディレクトリを走査して計画を立て、重複チェックと安全な出力名の生成を行っています（<a class="link" href="https://github.com/mitz17/mp3-normalizer/blob/main/processor.py#L180-L232"  target="_blank" rel="noopener"
+    >GitHub の該当コード</a> から抜粋）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> index, entry <span style="color:#f92672">in</span> enumerate(plan<span style="color:#f92672">.</span>entries, start<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>    destination <span style="color:#f92672">=</span> output_dir <span style="color:#f92672">/</span> entry<span style="color:#f92672">.</span>relative
+</span></span><span style="display:flex;"><span>    ensure_directory(destination<span style="color:#f92672">.</span>parent)
+</span></span><span style="display:flex;"><span>    destination <span style="color:#f92672">=</span> destination<span style="color:#f92672">.</span>with_suffix(<span style="color:#e6db74">&#34;.mp3&#34;</span>)
+</span></span><span style="display:flex;"><span>    destination <span style="color:#f92672">=</span> generate_unique_output_path(destination)
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>executor<span style="color:#f92672">.</span>normalize(
+</span></span><span style="display:flex;"><span>        input_file<span style="color:#f92672">=</span>entry<span style="color:#f92672">.</span>source,
+</span></span><span style="display:flex;"><span>        destination<span style="color:#f92672">=</span>destination,
+</span></span><span style="display:flex;"><span>        target_lufs<span style="color:#f92672">=</span>target_lufs,
+</span></span><span style="display:flex;"><span>        true_peak<span style="color:#f92672">=</span>true_peak,
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    results<span style="color:#f92672">.</span>append(result)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> result<span style="color:#f92672">.</span>success:
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>history_service<span style="color:#f92672">.</span>mark_processed(entry<span style="color:#f92672">.</span>relative, entry<span style="color:#f92672">.</span>size, entry<span style="color:#f92672">.</span>mtime)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>self<span style="color:#f92672">.</span>history_service<span style="color:#f92672">.</span>save()
+</span></span></code></pre></div><p>このループで <code>generate_unique_output_path</code> が既存ファイルを検知すると <code>_1</code>, <code>_2</code> …を末尾に付与するので、デフォルト (<code>force=False</code>) では上書きされません。さらに <code>HistoryService</code> が <code>processed_history.json</code> にサイズ・更新日時を記録し、同じファイルを再度見つけてもスキップします。まさに「上書きしない設定なので安心」という設計です。</p>
+<p>実際に ffmpeg を叩くのは <code>FfmpegExecutor.normalize</code> で、コマンド全体を整形してログに残します（<a class="link" href="https://github.com/mitz17/mp3-normalizer/blob/main/processor.py#L63-L111"  target="_blank" rel="noopener"
+    >コードはこちら</a>）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>command <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    self<span style="color:#f92672">.</span>ffmpeg_cmd, <span style="color:#e6db74">&#34;-hide_banner&#34;</span>, <span style="color:#e6db74">&#34;-y&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;-i&#34;</span>, str(input_file),
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;-af&#34;</span>, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;loudnorm=I=</span><span style="color:#e6db74">{</span>target_lufs<span style="color:#e6db74">}</span><span style="color:#e6db74">:TP=</span><span style="color:#e6db74">{</span>true_peak<span style="color:#e6db74">}</span><span style="color:#e6db74">:LRA=11&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;-c:a&#34;</span>, <span style="color:#e6db74">&#34;libmp3lame&#34;</span>, <span style="color:#e6db74">&#34;-q:a&#34;</span>, <span style="color:#e6db74">&#34;2&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;-map_metadata&#34;</span>, <span style="color:#e6db74">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>    str(destination),
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>command_str <span style="color:#f92672">=</span> format_command(command)
+</span></span><span style="display:flex;"><span>self<span style="color:#f92672">.</span>logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#34;ffmpeg コマンド: </span><span style="color:#e6db74">%s</span><span style="color:#e6db74">&#34;</span>, command_str)
+</span></span><span style="display:flex;"><span>completed <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>run(command, check<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>, capture_output<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, text<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><p><code>subprocess.run</code> の戻り値で成功/失敗を判断しており、GUI のログ欄にも同じコマンド文字列が流れるため、裏で何をしているかが一目で分かります。</p>
 <h2 id="gui-の操作感">GUI の操作感
 </h2><ol>
 <li>入力・出力ディレクトリを指定すると、対象 MP3 がリストでずらっと表示されます。</li>
@@ -271,9 +307,6 @@
         <p>GUI 全体をざっくり再現したモック。入力/出力、ターゲット LUFS、対象ファイル、ログまで 1 画面で見渡せます。</p>
 
     </blockquote>
-<h2 id="cli-の使いどころ">CLI の使いどころ
-</h2><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python main.py --cli --input ./old_mp3 --output ./normalized   --lufs -15.0 --true-peak -1.0 --force
-</span></span></code></pre></div><p>CI/CD やタスクスケジューラから呼び出すならこちら。終了コード 0/1/2 で「成功/入力エラー/部分失敗」を判定でき、<code>--force</code> で履歴を無視して再実行することも可能です。</p>
 <h2 id="まとめ">まとめ
 </h2><ul>
 <li>Tkinter × ffmpeg という素朴な構成でも、音量正規化の面倒くささはかなり解消できる</li>
