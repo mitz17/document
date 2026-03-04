@@ -1,512 +1,152 @@
-<!DOCTYPE html>
-<html lang="ja-jp" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="ChromeDriverを自動取得するPythonツール get-chrome-driver の開発のきっかけ、処理ごとの動き、利用方法">
-<title>Selenium使用時にChromeDriverを自動更新する方法</title>
-
-
-<link rel="canonical" href="http://localhost:1313/blog/get-chrome-driver-python/">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
-
-
-<link rel="stylesheet" href="/scss/style.min.e731670fe2c43ab45128606953c51f39db5dd0641163153866865cff237902a0.css"><meta property='og:title' content="Selenium使用時にChromeDriverを自動更新する方法">
-<meta property='og:description' content="ChromeDriverを自動取得するPythonツール get-chrome-driver の開発のきっかけ、処理ごとの動き、利用方法">
-<meta property='og:url' content='http://localhost:1313/blog/get-chrome-driver-python/'>
-<meta property='og:site_name' content='もざぶれなるままに'>
-<meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='Python' /><meta property='article:tag' content='Selenium' /><meta property='article:tag' content='ChromeDriver' /><meta property='article:tag' content='自動化' /><meta property='article:tag' content='スクレイピング' /><meta property='article:published_time' content='2026-03-04T00:00:00&#43;09:00'/><meta property='article:modified_time' content='2026-03-04T00:00:00&#43;09:00'/>
-<meta name="twitter:title" content="Selenium使用時にChromeDriverを自動更新する方法">
-<meta name="twitter:description" content="ChromeDriverを自動取得するPythonツール get-chrome-driver の開発のきっかけ、処理ごとの動き、利用方法">
-    <link rel="shortcut icon" href="/images/favicon.png" />
-
-    </head>
-    <body class="
-    article-page
-    ">
-    <script>
-        (function() {
-            const colorSchemeKey = 'StackColorScheme';
-            if(!localStorage.getItem(colorSchemeKey)){
-                localStorage.setItem(colorSchemeKey, "auto");
-            }
-        })();
-    </script><script>
-    (function() {
-        const colorSchemeKey = 'StackColorScheme';
-        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
-        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
-
-        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
-            
-
-            document.documentElement.dataset.scheme = 'dark';
-        } else {
-            document.documentElement.dataset.scheme = 'light';
-        }
-    })();
-</script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
-        <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-        </span>
-    </button>
-
-    <header>
-        
-        
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">もざぶれなるままに</a></h1>
-            <h2 class="site-description"></h2>
-        </div>
-    </header><ol class="menu" id="main-menu">
-        
-        
-        
-        <li >
-            <a href='/' >
-                
-                <span>ホーム</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/blog/' >
-                
-                <span>記事一覧</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/page/about/' >
-                
-                <span>プロフィール</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/page/contact/' >
-                
-                <span>お問い合わせ</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/page/privacy/' >
-                
-                <span>プライバシーポリシー</span>
-            </a>
-        </li>
-        
-        <li class="menu-bottom-section">
-            <ol class="menu">
-
-                
-                    <li id="dark-mode-toggle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="8" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="16" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <span>ダークモード</span>
-                    </li>
-                
-            </ol>
-        </li>
-    </ol>
-</aside>
-
-    
-
-            <main class="main full-width">
-    <article class="main-article">
-    <header class="article-header">
-
-    <div class="article-details">
-    
-    <header class="article-category">
-        
-            
-            
-            
-            <a href="/categories/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88/" style="background-color: hsl(342, 60%, 84%); color: hsl(342, 60%, 15%);">
-                プロジェクト
-            </a>
-        
-    </header>
-    
-
-    <div class="article-title-wrapper">
-        <h2 class="article-title">
-            <a href="/blog/get-chrome-driver-python/">Selenium使用時にChromeDriverを自動更新する方法</a>
-        </h2>
-    
-        
-        <h3 class="article-subtitle">
-            ChromeDriverを自動取得するPythonツール get-chrome-driver の開発のきっかけ、処理ごとの動き、利用方法
-        </h3>
-        
-    </div>
-
-    
-    
-    
-    
-    <footer class="article-time">
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
-  <circle cx="18" cy="18" r="4" />
-  <path d="M15 3v4" />
-  <path d="M7 3v4" />
-  <path d="M3 11h16" />
-  <path d="M18 16.496v1.504l1 1" />
-</svg>
-                <time class="article-time--published" datetime='2026-03-04T00:00:00&#43;09:00'>2026年3月4日水曜日</time>
-            </div>
-        
-
-        
-    </footer>
-    
-
-    
-
-    
-</div>
-
-</header>
-
-    
-
-    <section class="article-content">
-    
-    
-    <h2 id="開発のきっかけ">開発のきっかけ
-</h2><p>Selenium でスクレイピングを走らせていると、Chrome が自動更新された直後に ChromeDriver とのバージョン不一致が頻発します。ある日突然テストが落ち、ログを開くと次のようなメッセージが並んでいました。</p>
-<pre tabindex="0"><code>SessionNotCreatedException
+<!doctype html><html lang=ja-jp dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="ChromeDriverを自動取得するPythonツール get-chrome-driver の開発のきっかけ、処理ごとの動き、利用方法"><title>Selenium使用時にChromeDriverを自動更新する方法</title><link rel=canonical href=https://mitz17.com/blog/get-chrome-driver-python/><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=preload as=style href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap"><link rel=stylesheet href=/scss/style.min.e731670fe2c43ab45128606953c51f39db5dd0641163153866865cff237902a0.css><meta property='og:title' content="Selenium使用時にChromeDriverを自動更新する方法"><meta property='og:description' content="ChromeDriverを自動取得するPythonツール get-chrome-driver の開発のきっかけ、処理ごとの動き、利用方法"><meta property='og:url' content='https://mitz17.com/blog/get-chrome-driver-python/'><meta property='og:site_name' content='もざぶれなるままに'><meta property='og:type' content='article'><meta property='article:section' content='Blog'><meta property='article:tag' content='Python'><meta property='article:tag' content='Selenium'><meta property='article:tag' content='ChromeDriver'><meta property='article:tag' content='自動化'><meta property='article:tag' content='スクレイピング'><meta property='article:published_time' content='2026-03-04T00:00:00+09:00'><meta property='article:modified_time' content='2026-03-04T00:00:00+09:00'><meta name=twitter:title content="Selenium使用時にChromeDriverを自動更新する方法"><meta name=twitter:description content="ChromeDriverを自動取得するPythonツール get-chrome-driver の開発のきっかけ、処理ごとの動き、利用方法"><link rel="shortcut icon" href=/images/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=メニューを開く・閉じる>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><div class=site-meta><h1 class=site-name><a href=/>もざぶれなるままに</a></h1><h2 class=site-description></h2></div></header><ol class=menu id=main-menu><li><a href=/><span>ホーム</span></a></li><li><a href=/blog/><span>記事一覧</span></a></li><li><a href=/page/about/><span>プロフィール</span></a></li><li><a href=/page/contact/><span>お問い合わせ</span></a></li><li><a href=/page/privacy/><span>プライバシーポリシー</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>ダークモード</span></li></ol></li></ol></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88/ style=background-color:#efbecc;color:#3d0f1d>プロジェクト</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/blog/get-chrome-driver-python/>Selenium使用時にChromeDriverを自動更新する方法</a></h2><h3 class=article-subtitle>ChromeDriverを自動取得するPythonツール get-chrome-driver の開発のきっかけ、処理ごとの動き、利用方法</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2026-03-04T00:00:00+09:00>2026年3月4日水曜日</time></div></footer></div></header><section class=article-content><h2 id=開発のきっかけ>開発のきっかけ</h2><p>Selenium でスクレイピングを走らせていると、Chrome が自動更新された直後に ChromeDriver とのバージョン不一致が頻発します。ある日突然テストが落ち、ログを開くと次のようなメッセージが並んでいました。</p><pre tabindex=0><code>SessionNotCreatedException
 This version of ChromeDriver only supports Chrome version XX
 Current browser version is YY
-</code></pre><p>Selenium でブラウザを操作するには、Chrome 本体と一致する ChromeDriver を用意し続ける必要があります。しかし Chrome は自動更新されるため、毎回 ZIP を探して展開し、テスト端末へ配る作業がすぐにボトルネックになりました。</p>
-<p>追い打ちをかけるように 2023 年以降は配布元が <strong>Chrome for Testing (CfT) API</strong> に集約され、従来の URL では最新バージョンが手に入らないケースも出てきます。現場で必要だったのは、次の 3 ステップを自動でつないでくれる仕組みでした。 (chromeの自動アップデートを止めることでも対処できるがそれはセキュリティ上良くない(？)ので以下のプログラムを書きました。)</p>
-<h2 id="selenium実行前にchromedriverのバージョン不一致エラーを自動解決する">Selenium実行前にChromeDriverのバージョン不一致エラーを自動解決する
-</h2><ol>
-<li>Selenium実行前に端末にインストールされている Chrome のバージョンを検出する</li>
-<li>CfT API から一致する ChromeDriver をダウンロードし、検証済みの場所( <code>C:\Users\&lt;ユーザー名&gt;\.get-chrome-driver</code>)へ保存する</li>
-</ol>
-<p>このフローをワンコマンドで実現するために <code>get-chrome-driver</code> を作成し、この記事で処理内容を掘り下げています。</p>
-<h2 id="処理の流れ">処理の流れ
-</h2><h3 id="1-インストール済み-chrome-のバージョン検出">1. インストール済み Chrome のバージョン検出
-</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># get_chrome_driver/utils.py</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_chrome_version</span>():
-</span></span><span style="display:flex;"><span>    system <span style="color:#f92672">=</span> platform<span style="color:#f92672">.</span>system()
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> system <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Windows&#34;</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">import</span> locale
-</span></span><span style="display:flex;"><span>        encoding <span style="color:#f92672">=</span> locale<span style="color:#f92672">.</span>getpreferredencoding()
-</span></span><span style="display:flex;"><span>        paths <span style="color:#f92672">=</span> [
-</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;reg query &#34;HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon&#34; /v version&#39;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;reg query &#34;HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Google Chrome&#34; /v version&#39;</span>
-</span></span><span style="display:flex;"><span>        ]
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> cmd <span style="color:#f92672">in</span> paths:
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span>:
-</span></span><span style="display:flex;"><span>                raw_output <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>check_output(cmd, shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, stderr<span style="color:#f92672">=</span>subprocess<span style="color:#f92672">.</span>DEVNULL)
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">try</span>:
-</span></span><span style="display:flex;"><span>                    output <span style="color:#f92672">=</span> raw_output<span style="color:#f92672">.</span>decode(encoding)
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">UnicodeDecodeError</span>:
-</span></span><span style="display:flex;"><span>                    output <span style="color:#f92672">=</span> raw_output<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;cp932&#39;</span>, errors<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;replace&#39;</span>)
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">match</span> <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>search(<span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;version\s+REG_SZ\s+([\d\.]+)&#39;</span>, output)
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">match</span>:
-</span></span><span style="display:flex;"><span>                    version <span style="color:#f92672">=</span> <span style="color:#66d9ef">match</span><span style="color:#f92672">.</span>group(<span style="color:#ae81ff">1</span>)
-</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">break</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">except</span> subprocess<span style="color:#f92672">.</span>CalledProcessError:
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">continue</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> system <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Linux&#34;</span>:
-</span></span><span style="display:flex;"><span>        commands <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;google-chrome&#34;</span>, <span style="color:#e6db74">&#34;google-chrome-stable&#34;</span>, <span style="color:#e6db74">&#34;chromium&#34;</span>, <span style="color:#e6db74">&#34;chromium-browser&#34;</span>]
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> cmd <span style="color:#f92672">in</span> commands:
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span>:
-</span></span><span style="display:flex;"><span>                output <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>check_output([cmd, <span style="color:#e6db74">&#34;--version&#34;</span>])<span style="color:#f92672">.</span>decode()<span style="color:#f92672">.</span>strip()
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">match</span> <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>search(<span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;[\d\.]+&#39;</span>, output)
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">match</span>:
-</span></span><span style="display:flex;"><span>                    version <span style="color:#f92672">=</span> <span style="color:#66d9ef">match</span><span style="color:#f92672">.</span>group(<span style="color:#ae81ff">0</span>)
-</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">break</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">except</span> (subprocess<span style="color:#f92672">.</span>CalledProcessError, <span style="color:#a6e22e">FileNotFoundError</span>):
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">continue</span>
-</span></span></code></pre></div><p>Windows ではまずレジストリ (<code>BLBeacon</code>, <code>Uninstall</code>) を走査し、取得できなければ同関数の後半で <code>chrome.exe</code> の <code>ProductVersion</code> を PowerShell から読む実装です。macOS も <code>--version</code> の標準出力を解析し、Linux は <code>google-chrome</code> / <code>chromium-browser</code> など複数コマンドをリトライして一番最初に成功したもののバージョンを返します。</p>
-<h3 id="2-プラットフォーム文字列の決定">2. プラットフォーム文字列の決定
-</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># get_chrome_driver/api.py</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_platform_string</span>():
-</span></span><span style="display:flex;"><span>    os_name <span style="color:#f92672">=</span> platform<span style="color:#f92672">.</span>system()
-</span></span><span style="display:flex;"><span>    arch <span style="color:#f92672">=</span> platform<span style="color:#f92672">.</span>machine()
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> os_name <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Linux&#34;</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;linux64&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> os_name <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Darwin&#34;</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> arch <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;arm64&#34;</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;mac-arm64&#34;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;mac-x64&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> os_name <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Windows&#34;</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> sys<span style="color:#f92672">.</span>maxsize <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">**</span><span style="color:#ae81ff">32</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;win64&#34;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;win32&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span>
-</span></span></code></pre></div><p>CfT の JSON に合わせたプラットフォーム名をここで決めています。特に Windows は Python が 64bit かで <code>win64</code>/<code>win32</code> を出し分け、後続の API コールが一意の URL を得られるようにしています。</p>
-<h3 id="3-cft-api-からドライバーアーカイブを検索">3. CfT API からドライバーアーカイブを検索
-</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># get_chrome_driver/api.py</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_driver_download_url</span>(chrome_version, platform_name):
-</span></span><span style="display:flex;"><span>    major_version <span style="color:#f92672">=</span> chrome_version<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;.&#39;</span>)[<span style="color:#ae81ff">0</span>]
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
-</span></span><span style="display:flex;"><span>        response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(KNOWN_GOOD_URL, timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>)
-</span></span><span style="display:flex;"><span>        response<span style="color:#f92672">.</span>raise_for_status()
-</span></span><span style="display:flex;"><span>        version, url <span style="color:#f92672">=</span> _extract_from_versions(response<span style="color:#f92672">.</span>json()<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;versions&#39;</span>, []), major_version, platform_name)
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> url:
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> url
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
-</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;CfT known-good 取得中にエラーが発生しました: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
-</span></span><span style="display:flex;"><span>        response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(LAST_KNOWN_GOOD_URL, timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>)
-</span></span><span style="display:flex;"><span>        response<span style="color:#f92672">.</span>raise_for_status()
-</span></span><span style="display:flex;"><span>        payload <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>json()
-</span></span><span style="display:flex;"><span>        version, url <span style="color:#f92672">=</span> _extract_from_versions(payload<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;versions&#39;</span>, []), major_version, platform_name)
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> url:
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> url
-</span></span><span style="display:flex;"><span>        version, url <span style="color:#f92672">=</span> _extract_from_channels(payload<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;channels&#39;</span>, {}), major_version, platform_name)
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> url:
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> url
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
-</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;CfT last-known-good 取得中にエラーが発生しました: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span>
-</span></span></code></pre></div><p>まず <code>known-good</code> を参照し、それで見つからなければ <code>last-known-good</code> の <code>versions</code> → <code>channels</code> を順に探して Stable/Beta/Dev/Canary からリンクを決定します。メジャーバージョンの一致だけを条件にしているため、Chrome の細かなビルド番号が異なっても同系列のドライバーを拾えるようになっています。</p>
-<h3 id="4-既存ドライバーとの突き合わせ">4. 既存ドライバーとの突き合わせ
-</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># get_chrome_driver/core.py</span>
-</span></span><span style="display:flex;"><span>existing_version <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>_get_installed_driver_version()
-</span></span><span style="display:flex;"><span>target_major <span style="color:#f92672">=</span> version<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;.&#39;</span>)[<span style="color:#ae81ff">0</span>]
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> existing_version:
-</span></span><span style="display:flex;"><span>    existing_major <span style="color:#f92672">=</span> existing_version<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;.&#39;</span>)[<span style="color:#ae81ff">0</span>]
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> existing_major <span style="color:#f92672">==</span> target_major <span style="color:#f92672">and</span> self<span style="color:#f92672">.</span>driver_path<span style="color:#f92672">.</span>exists():
-</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;既存の ChromeDriver (バージョン </span><span style="color:#e6db74">{</span>existing_version<span style="color:#e6db74">}</span><span style="color:#e6db74">) は互換性があります。&#34;</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> str(self<span style="color:#f92672">.</span>driver_path)
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
-</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;ChromeDriver を更新します: 現在 </span><span style="color:#e6db74">{</span>existing_version<span style="color:#e6db74">}</span><span style="color:#e6db74"> -&gt; 目標メジャー </span><span style="color:#e6db74">{</span>target_major<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
-</span></span></code></pre></div><p>インストーラは保存済みドライバーのメジャー番号と Chrome 側の番号を比較し、同じであればダウンロードを省略します。互換性が崩れたタイミングだけ更新メッセージを出し、後続のダウンロード処理に進みます。</p>
-<h3 id="5-アーカイブのダウンロードと安全な展開">5. アーカイブのダウンロードと安全な展開
-</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># get_chrome_driver/core.py</span>
-</span></span><span style="display:flex;"><span>response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url, timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>)
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> zipfile<span style="color:#f92672">.</span>ZipFile(io<span style="color:#f92672">.</span>BytesIO(response<span style="color:#f92672">.</span>content)) <span style="color:#66d9ef">as</span> z:
-</span></span><span style="display:flex;"><span>    driver_member <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> member <span style="color:#f92672">in</span> z<span style="color:#f92672">.</span>infolist():
-</span></span><span style="display:flex;"><span>        member_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>normpath(member<span style="color:#f92672">.</span>filename)
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isabs(member_path) <span style="color:#f92672">or</span> member_path<span style="color:#f92672">.</span>startswith(<span style="color:#e6db74">&#34;..&#34;</span>):
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">continue</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(member_path) <span style="color:#f92672">==</span> self<span style="color:#f92672">.</span>driver_name:
-</span></span><span style="display:flex;"><span>            driver_member <span style="color:#f92672">=</span> member
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> z<span style="color:#f92672">.</span>open(driver_member) <span style="color:#66d9ef">as</span> source, open(self<span style="color:#f92672">.</span>driver_path, <span style="color:#e6db74">&#34;wb&#34;</span>) <span style="color:#66d9ef">as</span> target:
-</span></span><span style="display:flex;"><span>        shutil<span style="color:#f92672">.</span>copyfileobj(source, target)
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>name <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;nt&#34;</span>:
-</span></span><span style="display:flex;"><span>    self<span style="color:#f92672">.</span>driver_path<span style="color:#f92672">.</span>chmod(<span style="color:#ae81ff">0o755</span>)
-</span></span></code></pre></div><p>ZIP 内のパスに <code>..</code> や絶対パスが含まれる場合はスキップし、<code>chromedriver(.exe)</code> に一致したファイルだけを展開しています。展開後は macOS/Linux で実行権限を与え、Windows でも <code>~/.get-chrome-driver/</code>（実際はユーザーのホームディレクトリ）内に常に最新をそろえる形です。</p>
-<h3 id="6-selenium-での動作検証">6. Selenium での動作検証
-</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># get_chrome_driver/core.py</span>
-</span></span><span style="display:flex;"><span>options <span style="color:#f92672">=</span> Options()
-</span></span><span style="display:flex;"><span>options<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;--headless&#34;</span>)
-</span></span><span style="display:flex;"><span>options<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;--no-sandbox&#34;</span>)
-</span></span><span style="display:flex;"><span>options<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;--disable-dev-shm-usage&#34;</span>)
-</span></span><span style="display:flex;"><span>service <span style="color:#f92672">=</span> Service(executable_path<span style="color:#f92672">=</span>driver_path)
-</span></span><span style="display:flex;"><span>driver <span style="color:#f92672">=</span> webdriver<span style="color:#f92672">.</span>Chrome(service<span style="color:#f92672">=</span>service, options<span style="color:#f92672">=</span>options)
-</span></span><span style="display:flex;"><span>driver<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;https://google.com&#34;</span>)
-</span></span><span style="display:flex;"><span>title <span style="color:#f92672">=</span> driver<span style="color:#f92672">.</span>title
-</span></span><span style="display:flex;"><span>driver<span style="color:#f92672">.</span>quit()
-</span></span></code></pre></div><p>上記を <code>GetChromeDriver.validate()</code> が実行し、Google まで到達できれば「接続成功」として True を返します。<code>main.py</code> 側の <code>--no-validate</code> フラグを立てればこの Selenium チェックをスキップでき、ネットワークに制限がある CI や配布先でも柔軟に運用できます。</p>
-<h2 id="使用方法">使用方法
-</h2><h3 id="前提">前提
-</h3><ul>
-<li>Python 3.8 以上</li>
-<li>Chrome とネットワークにアクセスできる環境</li>
-</ul>
-<h3 id="セットアップ手順">セットアップ手順
-</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># リポジトリを取得</span>
-</span></span><span style="display:flex;"><span>cd C:\workspace\projects
-</span></span><span style="display:flex;"><span>python -m venv .venv
-</span></span><span style="display:flex;"><span>.\.venv\Scripts\Activate.ps1
-</span></span><span style="display:flex;"><span>pip install -r get-chrome-driver\requirements.txt
-</span></span></code></pre></div><h3 id="基本的なコマンド">基本的なコマンド
-</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># ChromeDriver を取得しヘッドレスで動作検証</span>
-</span></span><span style="display:flex;"><span>python main.py
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 端末に入っている Chrome のバージョンだけ確認</span>
-</span></span><span style="display:flex;"><span>python main.py --check
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># ドライバー取得だけ行い、Selenium 検証を省略</span>
-</span></span><span style="display:flex;"><span>python main.py --no-validate
-</span></span></code></pre></div><p><code>~/.get-chrome-driver/</code>（Windows の場合は <code>C:\Users\&lt;ユーザー名&gt;\.get-chrome-driver</code>）に <code>chromedriver.exe</code> が保存されます。PATH を通す必要はなく、Selenium からは <code>driver_path</code> を明示的に渡せば利用できます。</p>
-<h3 id="モジュールとして-selenium-スクリプトに組み込む">モジュールとして Selenium スクリプトに組み込む
-</h3><p>CLI での単発実行だけでなく、Selenium のテストコード側に <code>GetChromeDriver</code> を import して毎回ドライバーを揃えるのが手堅いやり方です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> get_chrome_driver.core <span style="color:#f92672">import</span> GetChromeDriver
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> selenium <span style="color:#f92672">import</span> webdriver
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> selenium.webdriver.chrome.service <span style="color:#f92672">import</span> Service
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>installer <span style="color:#f92672">=</span> GetChromeDriver()
-</span></span><span style="display:flex;"><span>driver_path <span style="color:#f92672">=</span> installer<span style="color:#f92672">.</span>install()
-</span></span><span style="display:flex;"><span>service <span style="color:#f92672">=</span> Service(executable_path<span style="color:#f92672">=</span>driver_path)
-</span></span><span style="display:flex;"><span>driver <span style="color:#f92672">=</span> webdriver<span style="color:#f92672">.</span>Chrome(service<span style="color:#f92672">=</span>service)
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># 以降 Selenium の操作</span>
-</span></span></code></pre></div><p>テスト実行時に上記を呼び出しておけば、Chrome が自動更新された直後でも必ずマッチした ChromeDriver を取得でき、毎回のダウンロード結果も <code>~/.get-chrome-driver/</code> にキャッシュされます。</p>
-<h2 id="さいごに">さいごに
-</h2><p>ChromeDriver の取得ルールは今後も変わる可能性があるため、CfT API の応答仕様が変わった際は <code>api.py</code> のパースロジックだけを差し替えれば再利用できる構成にしてあります。バージョン突き合わせから検証までを自動化しておけば、リグレッションテストの前準備にかかっていた時間を別の作業に割り当てられるはずです。</p>
-
-</section>
-
-
-    <footer class="article-footer">
-    
-    <section class="article-tags">
-        
-            <a href="/tags/python/">Python</a>
-        
-            <a href="/tags/selenium/">Selenium</a>
-        
-            <a href="/tags/chromedriver/">ChromeDriver</a>
-        
-            <a href="/tags/%E8%87%AA%E5%8B%95%E5%8C%96/">自動化</a>
-        
-            <a href="/tags/%E3%82%B9%E3%82%AF%E3%83%AC%E3%82%A4%E3%83%94%E3%83%B3%E3%82%B0/">スクレイピング</a>
-        
-    </section>
-<section class="article-share" aria-label="この記事をシェアする">
-    <p class="article-share__title">この記事をシェアする</p>
-    <div class="article-share__buttons">
-            <a class="article-share__button article-share__button--x" href="https://twitter.com/intent/tweet?url=http%3A%2F%2Flocalhost%3A1313%2Fblog%2Fget-chrome-driver-python%2F&amp;text=Selenium%E4%BD%BF%E7%94%A8%E6%99%82%E3%81%ABChromeDriver%E3%82%92%E8%87%AA%E5%8B%95%E6%9B%B4%E6%96%B0%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)でシェア">X (Twitter)</a>
-            <a class="article-share__button article-share__button--facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A1313%2Fblog%2Fget-chrome-driver-python%2F" target="_blank" rel="noopener noreferrer" aria-label="Facebookでシェア">Facebook</a>
-            <a class="article-share__button article-share__button--line" href="https://social-plugins.line.me/lineit/share?url=http%3A%2F%2Flocalhost%3A1313%2Fblog%2Fget-chrome-driver-python%2F" target="_blank" rel="noopener noreferrer" aria-label="LINEでシェア">LINE</a>
-            <a class="article-share__button article-share__button--hatena" href="https://b.hatena.ne.jp/add?mode=confirm&amp;url=http%3A%2F%2Flocalhost%3A1313%2Fblog%2Fget-chrome-driver-python%2F&amp;title=Selenium%E4%BD%BF%E7%94%A8%E6%99%82%E3%81%ABChromeDriver%E3%82%92%E8%87%AA%E5%8B%95%E6%9B%B4%E6%96%B0%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95" target="_blank" rel="noopener noreferrer" aria-label="はてブでシェア">はてブ</a>
-            <a class="article-share__button article-share__button--bluesky" href="https://bsky.app/intent/compose?text=Selenium%E4%BD%BF%E7%94%A8%E6%99%82%E3%81%ABChromeDriver%E3%82%92%E8%87%AA%E5%8B%95%E6%9B%B4%E6%96%B0%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95%20http%3A%2F%2Flocalhost%3A1313%2Fblog%2Fget-chrome-driver-python%2F" target="_blank" rel="noopener noreferrer" aria-label="Blueskyでシェア">Bluesky</a>
-    </div>
-</section></footer>
-
-    
-</article>
-
-    
-
-    
-<aside class="related-content--wrapper">
-    <h2 class="section-title">おすすめ記事</h2>
-    <div class="related-content related-content--compact">
-        <div class="article-list--compact">
-            
-                <article>
-    <a href="/blog/power-automate-sharepoint-excel/">
-        <div class="article-details">
-            <h2 class="article-title">Power Automateで前月分をSharePoint→Excelへ送るときの落とし穴</h2>
-            <footer class="article-time">
-                <time datetime='2026-03-03T18:05:00&#43;09:00'>2026年3月3日火曜日</time>
-            </footer>
-        </div>
-    </a>
-</article>
-            
-                <article>
-    <a href="/blog/mp3-lufs-normalizer-python/">
-        <div class="article-details">
-            <h2 class="article-title">MP3音量を自動調整するツールをPythonで作る LUFS正規化開発ログ</h2>
-            <footer class="article-time">
-                <time datetime='2026-03-02T00:00:00&#43;09:00'>2026年3月2日月曜日</time>
-            </footer>
-        </div>
-    </a>
-</article>
-            
-                <article>
-    <a href="/blog/my-first-post/">
-        <div class="article-details">
-            <h2 class="article-title">ブログ初投稿のテスト</h2>
-            <footer class="article-time">
-                <time datetime='2026-03-01T11:17:14&#43;09:00'>2026年3月1日日曜日</time>
-            </footer>
-        </div>
-    </a>
-</article>
-            
-                <article>
-    <a href="/blog/receive-email/">
-        <div class="article-details">
-            <h2 class="article-title">Cloudflare Email Routingで独自ドメインのメールを受信する</h2>
-            <footer class="article-time">
-                <time datetime='2026-03-02T12:00:00&#43;09:00'>2026年3月2日月曜日</time>
-            </footer>
-        </div>
-    </a>
-</article>
-            
-        </div>
-    </div>
-</aside>
-     
-    
-        
-        <div class="disqus-container">
-    
-</div>
-
-<style>
-    .disqus-container {
-        background-color: var(--card-background);
-        border-radius: var(--card-border-radius);
-        box-shadow: var(--shadow-l1);
-        padding: var(--card-padding);
-    }
-</style>
-
-<script>
-    window.addEventListener('onColorSchemeChange', (e) => {
-        if (typeof DISQUS == 'object') {
-            DISQUS.reset({
-                reload: true
-            });
-        }
-    })
-</script>
-    
-
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-        2026 もざぶれなるままに
-    </section>
-    
-    <section class="powerby">
-        <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
-        テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
-    </section>
-</footer>
-
-
-    
-
-
-
-<script type="module">
+</code></pre><p>Selenium でブラウザを操作するには、Chrome 本体と一致する ChromeDriver を用意し続ける必要があります。しかし Chrome は自動更新されるため、毎回 ZIP を探して展開し、テスト端末へ配る作業がすぐにボトルネックになりました。</p><p>追い打ちをかけるように 2023 年以降は配布元が <strong>Chrome for Testing (CfT) API</strong> に集約され、従来の URL では最新バージョンが手に入らないケースも出てきます。現場で必要だったのは、次の 3 ステップを自動でつないでくれる仕組みでした。 (chromeの自動アップデートを止めることでも対処できるがそれはセキュリティ上良くない(？)ので以下のプログラムを書きました。)</p><h2 id=selenium実行前にchromedriverのバージョン不一致エラーを自動解決する>Selenium実行前にChromeDriverのバージョン不一致エラーを自動解決する</h2><ol><li>Selenium実行前に端末にインストールされている Chrome のバージョンを検出する</li><li>CfT API から一致する ChromeDriver をダウンロードし、検証済みの場所( <code>C:\Users\&lt;ユーザー名>\.get-chrome-driver</code>)へ保存する</li></ol><p>このフローをワンコマンドで実現するために <code>get-chrome-driver</code> を作成し、この記事で処理内容を掘り下げています。</p><h2 id=処理の流れ>処理の流れ</h2><h3 id=1-インストール済み-chrome-のバージョン検出>1. インストール済み Chrome のバージョン検出</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># get_chrome_driver/utils.py</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>get_chrome_version</span>():
+</span></span><span style=display:flex><span>    system <span style=color:#f92672>=</span> platform<span style=color:#f92672>.</span>system()
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> system <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;Windows&#34;</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>import</span> locale
+</span></span><span style=display:flex><span>        encoding <span style=color:#f92672>=</span> locale<span style=color:#f92672>.</span>getpreferredencoding()
+</span></span><span style=display:flex><span>        paths <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>r</span><span style=color:#e6db74>&#39;reg query &#34;HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon&#34; /v version&#39;</span>,
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>r</span><span style=color:#e6db74>&#39;reg query &#34;HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Google Chrome&#34; /v version&#39;</span>
+</span></span><span style=display:flex><span>        ]
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> cmd <span style=color:#f92672>in</span> paths:
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>                raw_output <span style=color:#f92672>=</span> subprocess<span style=color:#f92672>.</span>check_output(cmd, shell<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>, stderr<span style=color:#f92672>=</span>subprocess<span style=color:#f92672>.</span>DEVNULL)
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>                    output <span style=color:#f92672>=</span> raw_output<span style=color:#f92672>.</span>decode(encoding)
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>except</span> <span style=color:#a6e22e>UnicodeDecodeError</span>:
+</span></span><span style=display:flex><span>                    output <span style=color:#f92672>=</span> raw_output<span style=color:#f92672>.</span>decode(<span style=color:#e6db74>&#39;cp932&#39;</span>, errors<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;replace&#39;</span>)
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>match</span> <span style=color:#f92672>=</span> re<span style=color:#f92672>.</span>search(<span style=color:#e6db74>r</span><span style=color:#e6db74>&#39;version\s+REG_SZ\s+([\d\.]+)&#39;</span>, output)
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>match</span>:
+</span></span><span style=display:flex><span>                    version <span style=color:#f92672>=</span> <span style=color:#66d9ef>match</span><span style=color:#f92672>.</span>group(<span style=color:#ae81ff>1</span>)
+</span></span><span style=display:flex><span>                    <span style=color:#66d9ef>break</span>
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>except</span> subprocess<span style=color:#f92672>.</span>CalledProcessError:
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>continue</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>elif</span> system <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;Linux&#34;</span>:
+</span></span><span style=display:flex><span>        commands <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#34;google-chrome&#34;</span>, <span style=color:#e6db74>&#34;google-chrome-stable&#34;</span>, <span style=color:#e6db74>&#34;chromium&#34;</span>, <span style=color:#e6db74>&#34;chromium-browser&#34;</span>]
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> cmd <span style=color:#f92672>in</span> commands:
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>                output <span style=color:#f92672>=</span> subprocess<span style=color:#f92672>.</span>check_output([cmd, <span style=color:#e6db74>&#34;--version&#34;</span>])<span style=color:#f92672>.</span>decode()<span style=color:#f92672>.</span>strip()
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>match</span> <span style=color:#f92672>=</span> re<span style=color:#f92672>.</span>search(<span style=color:#e6db74>r</span><span style=color:#e6db74>&#39;[\d\.]+&#39;</span>, output)
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>match</span>:
+</span></span><span style=display:flex><span>                    version <span style=color:#f92672>=</span> <span style=color:#66d9ef>match</span><span style=color:#f92672>.</span>group(<span style=color:#ae81ff>0</span>)
+</span></span><span style=display:flex><span>                    <span style=color:#66d9ef>break</span>
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>except</span> (subprocess<span style=color:#f92672>.</span>CalledProcessError, <span style=color:#a6e22e>FileNotFoundError</span>):
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>continue</span>
+</span></span></code></pre></div><p>Windows ではまずレジストリ (<code>BLBeacon</code>, <code>Uninstall</code>) を走査し、取得できなければ同関数の後半で <code>chrome.exe</code> の <code>ProductVersion</code> を PowerShell から読む実装です。macOS も <code>--version</code> の標準出力を解析し、Linux は <code>google-chrome</code> / <code>chromium-browser</code> など複数コマンドをリトライして一番最初に成功したもののバージョンを返します。</p><h3 id=2-プラットフォーム文字列の決定>2. プラットフォーム文字列の決定</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># get_chrome_driver/api.py</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>get_platform_string</span>():
+</span></span><span style=display:flex><span>    os_name <span style=color:#f92672>=</span> platform<span style=color:#f92672>.</span>system()
+</span></span><span style=display:flex><span>    arch <span style=color:#f92672>=</span> platform<span style=color:#f92672>.</span>machine()
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> os_name <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;Linux&#34;</span>:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;linux64&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>elif</span> os_name <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;Darwin&#34;</span>:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> arch <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;arm64&#34;</span>:
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;mac-arm64&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;mac-x64&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>elif</span> os_name <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;Windows&#34;</span>:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> sys<span style=color:#f92672>.</span>maxsize <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>2</span><span style=color:#f92672>**</span><span style=color:#ae81ff>32</span>:
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;win64&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;win32&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>None</span>
+</span></span></code></pre></div><p>CfT の JSON に合わせたプラットフォーム名をここで決めています。特に Windows は Python が 64bit かで <code>win64</code>/<code>win32</code> を出し分け、後続の API コールが一意の URL を得られるようにしています。</p><h3 id=3-cft-api-からドライバーアーカイブを検索>3. CfT API からドライバーアーカイブを検索</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># get_chrome_driver/api.py</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>get_driver_download_url</span>(chrome_version, platform_name):
+</span></span><span style=display:flex><span>    major_version <span style=color:#f92672>=</span> chrome_version<span style=color:#f92672>.</span>split(<span style=color:#e6db74>&#39;.&#39;</span>)[<span style=color:#ae81ff>0</span>]
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>        response <span style=color:#f92672>=</span> requests<span style=color:#f92672>.</span>get(KNOWN_GOOD_URL, timeout<span style=color:#f92672>=</span><span style=color:#ae81ff>30</span>)
+</span></span><span style=display:flex><span>        response<span style=color:#f92672>.</span>raise_for_status()
+</span></span><span style=display:flex><span>        version, url <span style=color:#f92672>=</span> _extract_from_versions(response<span style=color:#f92672>.</span>json()<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#39;versions&#39;</span>, []), major_version, platform_name)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> url:
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> url
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>except</span> <span style=color:#a6e22e>Exception</span> <span style=color:#66d9ef>as</span> e:
+</span></span><span style=display:flex><span>        print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;CfT known-good 取得中にエラーが発生しました: </span><span style=color:#e6db74>{</span>e<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>        response <span style=color:#f92672>=</span> requests<span style=color:#f92672>.</span>get(LAST_KNOWN_GOOD_URL, timeout<span style=color:#f92672>=</span><span style=color:#ae81ff>30</span>)
+</span></span><span style=display:flex><span>        response<span style=color:#f92672>.</span>raise_for_status()
+</span></span><span style=display:flex><span>        payload <span style=color:#f92672>=</span> response<span style=color:#f92672>.</span>json()
+</span></span><span style=display:flex><span>        version, url <span style=color:#f92672>=</span> _extract_from_versions(payload<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#39;versions&#39;</span>, []), major_version, platform_name)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> url:
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> url
+</span></span><span style=display:flex><span>        version, url <span style=color:#f92672>=</span> _extract_from_channels(payload<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#39;channels&#39;</span>, {}), major_version, platform_name)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> url:
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> url
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>except</span> <span style=color:#a6e22e>Exception</span> <span style=color:#66d9ef>as</span> e:
+</span></span><span style=display:flex><span>        print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;CfT last-known-good 取得中にエラーが発生しました: </span><span style=color:#e6db74>{</span>e<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>None</span>
+</span></span></code></pre></div><p>まず <code>known-good</code> を参照し、それで見つからなければ <code>last-known-good</code> の <code>versions</code> → <code>channels</code> を順に探して Stable/Beta/Dev/Canary からリンクを決定します。メジャーバージョンの一致だけを条件にしているため、Chrome の細かなビルド番号が異なっても同系列のドライバーを拾えるようになっています。</p><h3 id=4-既存ドライバーとの突き合わせ>4. 既存ドライバーとの突き合わせ</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># get_chrome_driver/core.py</span>
+</span></span><span style=display:flex><span>existing_version <span style=color:#f92672>=</span> self<span style=color:#f92672>.</span>_get_installed_driver_version()
+</span></span><span style=display:flex><span>target_major <span style=color:#f92672>=</span> version<span style=color:#f92672>.</span>split(<span style=color:#e6db74>&#39;.&#39;</span>)[<span style=color:#ae81ff>0</span>]
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> existing_version:
+</span></span><span style=display:flex><span>    existing_major <span style=color:#f92672>=</span> existing_version<span style=color:#f92672>.</span>split(<span style=color:#e6db74>&#39;.&#39;</span>)[<span style=color:#ae81ff>0</span>]
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> existing_major <span style=color:#f92672>==</span> target_major <span style=color:#f92672>and</span> self<span style=color:#f92672>.</span>driver_path<span style=color:#f92672>.</span>exists():
+</span></span><span style=display:flex><span>        print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;既存の ChromeDriver (バージョン </span><span style=color:#e6db74>{</span>existing_version<span style=color:#e6db74>}</span><span style=color:#e6db74>) は互換性があります。&#34;</span>)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> str(self<span style=color:#f92672>.</span>driver_path)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span>:
+</span></span><span style=display:flex><span>        print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;ChromeDriver を更新します: 現在 </span><span style=color:#e6db74>{</span>existing_version<span style=color:#e6db74>}</span><span style=color:#e6db74> -&gt; 目標メジャー </span><span style=color:#e6db74>{</span>target_major<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span></code></pre></div><p>インストーラは保存済みドライバーのメジャー番号と Chrome 側の番号を比較し、同じであればダウンロードを省略します。互換性が崩れたタイミングだけ更新メッセージを出し、後続のダウンロード処理に進みます。</p><h3 id=5-アーカイブのダウンロードと安全な展開>5. アーカイブのダウンロードと安全な展開</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># get_chrome_driver/core.py</span>
+</span></span><span style=display:flex><span>response <span style=color:#f92672>=</span> requests<span style=color:#f92672>.</span>get(url, timeout<span style=color:#f92672>=</span><span style=color:#ae81ff>30</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> zipfile<span style=color:#f92672>.</span>ZipFile(io<span style=color:#f92672>.</span>BytesIO(response<span style=color:#f92672>.</span>content)) <span style=color:#66d9ef>as</span> z:
+</span></span><span style=display:flex><span>    driver_member <span style=color:#f92672>=</span> <span style=color:#66d9ef>None</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> member <span style=color:#f92672>in</span> z<span style=color:#f92672>.</span>infolist():
+</span></span><span style=display:flex><span>        member_path <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>normpath(member<span style=color:#f92672>.</span>filename)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>isabs(member_path) <span style=color:#f92672>or</span> member_path<span style=color:#f92672>.</span>startswith(<span style=color:#e6db74>&#34;..&#34;</span>):
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>continue</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>basename(member_path) <span style=color:#f92672>==</span> self<span style=color:#f92672>.</span>driver_name:
+</span></span><span style=display:flex><span>            driver_member <span style=color:#f92672>=</span> member
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>break</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>with</span> z<span style=color:#f92672>.</span>open(driver_member) <span style=color:#66d9ef>as</span> source, open(self<span style=color:#f92672>.</span>driver_path, <span style=color:#e6db74>&#34;wb&#34;</span>) <span style=color:#66d9ef>as</span> target:
+</span></span><span style=display:flex><span>        shutil<span style=color:#f92672>.</span>copyfileobj(source, target)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> os<span style=color:#f92672>.</span>name <span style=color:#f92672>!=</span> <span style=color:#e6db74>&#34;nt&#34;</span>:
+</span></span><span style=display:flex><span>    self<span style=color:#f92672>.</span>driver_path<span style=color:#f92672>.</span>chmod(<span style=color:#ae81ff>0o755</span>)
+</span></span></code></pre></div><p>ZIP 内のパスに <code>..</code> や絶対パスが含まれる場合はスキップし、<code>chromedriver(.exe)</code> に一致したファイルだけを展開しています。展開後は macOS/Linux で実行権限を与え、Windows でも <code>~/.get-chrome-driver/</code>（実際はユーザーのホームディレクトリ）内に常に最新をそろえる形です。</p><h3 id=6-selenium-での動作検証>6. Selenium での動作検証</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e># get_chrome_driver/core.py</span>
+</span></span><span style=display:flex><span>options <span style=color:#f92672>=</span> Options()
+</span></span><span style=display:flex><span>options<span style=color:#f92672>.</span>add_argument(<span style=color:#e6db74>&#34;--headless&#34;</span>)
+</span></span><span style=display:flex><span>options<span style=color:#f92672>.</span>add_argument(<span style=color:#e6db74>&#34;--no-sandbox&#34;</span>)
+</span></span><span style=display:flex><span>options<span style=color:#f92672>.</span>add_argument(<span style=color:#e6db74>&#34;--disable-dev-shm-usage&#34;</span>)
+</span></span><span style=display:flex><span>service <span style=color:#f92672>=</span> Service(executable_path<span style=color:#f92672>=</span>driver_path)
+</span></span><span style=display:flex><span>driver <span style=color:#f92672>=</span> webdriver<span style=color:#f92672>.</span>Chrome(service<span style=color:#f92672>=</span>service, options<span style=color:#f92672>=</span>options)
+</span></span><span style=display:flex><span>driver<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;https://google.com&#34;</span>)
+</span></span><span style=display:flex><span>title <span style=color:#f92672>=</span> driver<span style=color:#f92672>.</span>title
+</span></span><span style=display:flex><span>driver<span style=color:#f92672>.</span>quit()
+</span></span></code></pre></div><p>上記を <code>GetChromeDriver.validate()</code> が実行し、Google まで到達できれば「接続成功」として True を返します。<code>main.py</code> 側の <code>--no-validate</code> フラグを立てればこの Selenium チェックをスキップでき、ネットワークに制限がある CI や配布先でも柔軟に運用できます。</p><h2 id=使用方法>使用方法</h2><h3 id=前提>前提</h3><ul><li>Python 3.8 以上</li><li>Chrome とネットワークにアクセスできる環境</li></ul><h3 id=セットアップ手順>セットアップ手順</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-powershell data-lang=powershell><span style=display:flex><span><span style=color:#75715e># リポジトリを取得</span>
+</span></span><span style=display:flex><span>cd C:\workspace\projects
+</span></span><span style=display:flex><span>python -m venv .venv
+</span></span><span style=display:flex><span>.\.venv\Scripts\Activate.ps1
+</span></span><span style=display:flex><span>pip install -r get-chrome-driver\requirements.txt
+</span></span></code></pre></div><h3 id=基本的なコマンド>基本的なコマンド</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-powershell data-lang=powershell><span style=display:flex><span><span style=color:#75715e># ChromeDriver を取得しヘッドレスで動作検証</span>
+</span></span><span style=display:flex><span>python main.py
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 端末に入っている Chrome のバージョンだけ確認</span>
+</span></span><span style=display:flex><span>python main.py --check
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># ドライバー取得だけ行い、Selenium 検証を省略</span>
+</span></span><span style=display:flex><span>python main.py --no-validate
+</span></span></code></pre></div><p><code>~/.get-chrome-driver/</code>（Windows の場合は <code>C:\Users\&lt;ユーザー名>\.get-chrome-driver</code>）に <code>chromedriver.exe</code> が保存されます。PATH を通す必要はなく、Selenium からは <code>driver_path</code> を明示的に渡せば利用できます。</p><h3 id=モジュールとして-selenium-スクリプトに組み込む>モジュールとして Selenium スクリプトに組み込む</h3><p>CLI での単発実行だけでなく、Selenium のテストコード側に <code>GetChromeDriver</code> を import して毎回ドライバーを揃えるのが手堅いやり方です。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> get_chrome_driver.core <span style=color:#f92672>import</span> GetChromeDriver
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> selenium <span style=color:#f92672>import</span> webdriver
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> selenium.webdriver.chrome.service <span style=color:#f92672>import</span> Service
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>installer <span style=color:#f92672>=</span> GetChromeDriver()
+</span></span><span style=display:flex><span>driver_path <span style=color:#f92672>=</span> installer<span style=color:#f92672>.</span>install()
+</span></span><span style=display:flex><span>service <span style=color:#f92672>=</span> Service(executable_path<span style=color:#f92672>=</span>driver_path)
+</span></span><span style=display:flex><span>driver <span style=color:#f92672>=</span> webdriver<span style=color:#f92672>.</span>Chrome(service<span style=color:#f92672>=</span>service)
+</span></span><span style=display:flex><span><span style=color:#75715e># 以降 Selenium の操作</span>
+</span></span></code></pre></div><p>テスト実行時に上記を呼び出しておけば、Chrome が自動更新された直後でも必ずマッチした ChromeDriver を取得でき、毎回のダウンロード結果も <code>~/.get-chrome-driver/</code> にキャッシュされます。</p><h2 id=さいごに>さいごに</h2><p>ChromeDriver の取得ルールは今後も変わる可能性があるため、CfT API の応答仕様が変わった際は <code>api.py</code> のパースロジックだけを差し替えれば再利用できる構成にしてあります。バージョン突き合わせから検証までを自動化しておけば、リグレッションテストの前準備にかかっていた時間を別の作業に割り当てられるはずです。</p></section><footer class=article-footer><section class=article-tags><a href=/tags/python/>Python</a>
+<a href=/tags/selenium/>Selenium</a>
+<a href=/tags/chromedriver/>ChromeDriver</a>
+<a href=/tags/%E8%87%AA%E5%8B%95%E5%8C%96/>自動化</a>
+<a href=/tags/%E3%82%B9%E3%82%AF%E3%83%AC%E3%82%A4%E3%83%94%E3%83%B3%E3%82%B0/>スクレイピング</a></section><section class=article-share aria-label=この記事をシェアする><p class=article-share__title>この記事をシェアする</p><div class=article-share__buttons><a class="article-share__button article-share__button--x" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fmitz17.com%2Fblog%2Fget-chrome-driver-python%2F&amp;text=Selenium%E4%BD%BF%E7%94%A8%E6%99%82%E3%81%ABChromeDriver%E3%82%92%E8%87%AA%E5%8B%95%E6%9B%B4%E6%96%B0%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95" target=_blank rel="noopener noreferrer" aria-label="X (Twitter)でシェア">X (Twitter)</a>
+<a class="article-share__button article-share__button--facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmitz17.com%2Fblog%2Fget-chrome-driver-python%2F" target=_blank rel="noopener noreferrer" aria-label=Facebookでシェア>Facebook</a>
+<a class="article-share__button article-share__button--line" href="https://social-plugins.line.me/lineit/share?url=https%3A%2F%2Fmitz17.com%2Fblog%2Fget-chrome-driver-python%2F" target=_blank rel="noopener noreferrer" aria-label=LINEでシェア>LINE</a>
+<a class="article-share__button article-share__button--hatena" href="https://b.hatena.ne.jp/add?mode=confirm&amp;url=https%3A%2F%2Fmitz17.com%2Fblog%2Fget-chrome-driver-python%2F&amp;title=Selenium%E4%BD%BF%E7%94%A8%E6%99%82%E3%81%ABChromeDriver%E3%82%92%E8%87%AA%E5%8B%95%E6%9B%B4%E6%96%B0%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95" target=_blank rel="noopener noreferrer" aria-label=はてブでシェア>はてブ</a>
+<a class="article-share__button article-share__button--bluesky" href="https://bsky.app/intent/compose?text=Selenium%E4%BD%BF%E7%94%A8%E6%99%82%E3%81%ABChromeDriver%E3%82%92%E8%87%AA%E5%8B%95%E6%9B%B4%E6%96%B0%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95%20https%3A%2F%2Fmitz17.com%2Fblog%2Fget-chrome-driver-python%2F" target=_blank rel="noopener noreferrer" aria-label=Blueskyでシェア>Bluesky</a></div></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>おすすめ記事</h2><div class="related-content related-content--compact"><div class=article-list--compact><article><a href=/blog/mp3-lufs-normalizer-python/><div class=article-details><h2 class=article-title>MP3音量を自動調整するツールをPythonで作る LUFS正規化開発ログ</h2><footer class=article-time><time datetime=2026-03-02T00:00:00+09:00>2026年3月2日月曜日</time></footer></div></a></article><article><a href=/blog/my-first-post/><div class=article-details><h2 class=article-title>ブログ初投稿のテスト</h2><footer class=article-time><time datetime=2026-03-01T11:17:14+09:00>2026年3月1日日曜日</time></footer></div></a></article><article><a href=/blog/receive-email/><div class=article-details><h2 class=article-title>Cloudflare Email Routingで独自ドメインのメールを受信する</h2><footer class=article-time><time datetime=2026-03-02T12:00:00+09:00>2026年3月2日月曜日</time></footer></div></a></article><article><a href=/blog/power-automate-sharepoint-excel/><div class=article-details><h2 class=article-title>Power Automateで前月分をSharePoint→Excelへ送るときの落とし穴</h2><footer class=article-time><time datetime=2026-03-03T18:05:00+09:00>2026年3月3日火曜日</time></footer></div></a></article></div></div></aside><div class=disqus-container></div><style>.disqus-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding)}</style><script>window.addEventListener("onColorSchemeChange",e=>{typeof DISQUS=="object"&&DISQUS.reset({reload:!0})})</script><footer class=site-footer><section class=copyright>&copy;
+2026 もざぶれなるままに</section><section class=powerby><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> で構築されています。<br>テーマ <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=4.0.0>Stack</a></b> は <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> によって設計されています。</section></footer><script type=module>
     import gallery from '\/ts\/gallery.js';
 
     const articleContent = document.querySelector('.article-content');
@@ -530,14 +170,4 @@ Current browser version is YY
         });
         lightbox.init();
     }
-</script>
-    
-
-            </main>
-        </div>
-        
-<script type="text/javascript" src="/ts/main.8b02cda2756da0b47c8590829bd96dddf41d87c4b4aa44e43a1da5ad3ea91193.js" defer></script>
-
-
-    </body>
-</html>
+</script></main></div><script type=text/javascript src=/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js defer></script></body></html>
