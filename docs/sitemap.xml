@@ -3,7 +3,37 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://mitz17.com/categories/</loc>
-    <lastmod>2026-03-03T18:05:00+09:00</lastmod>
+    <lastmod>2026-03-04T00:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://mitz17.com/tags/chromedriver/</loc>
+    <lastmod>2026-03-04T00:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://mitz17.com/tags/python/</loc>
+    <lastmod>2026-03-04T00:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://mitz17.com/tags/selenium/</loc>
+    <lastmod>2026-03-04T00:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://mitz17.com/blog/get-chrome-driver-python/</loc>
+    <lastmod>2026-03-04T00:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://mitz17.com/tags/</loc>
+    <lastmod>2026-03-04T00:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://mitz17.com/tags/%E3%82%B9%E3%82%AF%E3%83%AC%E3%82%A4%E3%83%94%E3%83%B3%E3%82%B0/</loc>
+    <lastmod>2026-03-04T00:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://mitz17.com/categories/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88/</loc>
+    <lastmod>2026-03-04T00:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://mitz17.com/</loc>
+    <lastmod>2026-03-04T00:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://mitz17.com/blog/</loc>
+    <lastmod>2026-03-04T00:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://mitz17.com/tags/%E8%87%AA%E5%8B%95%E5%8C%96/</loc>
+    <lastmod>2026-03-04T00:00:00+09:00</lastmod>
   </url><url>
     <loc>https://mitz17.com/tags/excel/</loc>
     <lastmod>2026-03-03T18:05:00+09:00</lastmod>
@@ -17,22 +47,10 @@
     <loc>https://mitz17.com/tags/sharepoint-online/</loc>
     <lastmod>2026-03-03T18:05:00+09:00</lastmod>
   </url><url>
-    <loc>https://mitz17.com/tags/</loc>
-    <lastmod>2026-03-03T18:05:00+09:00</lastmod>
-  </url><url>
     <loc>https://mitz17.com/tags/%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC/</loc>
     <lastmod>2026-03-03T18:05:00+09:00</lastmod>
   </url><url>
     <loc>https://mitz17.com/categories/%E3%83%8E%E3%83%BC%E3%82%B3%E3%83%BC%E3%83%89/</loc>
-    <lastmod>2026-03-03T18:05:00+09:00</lastmod>
-  </url><url>
-    <loc>https://mitz17.com/</loc>
-    <lastmod>2026-03-03T18:05:00+09:00</lastmod>
-  </url><url>
-    <loc>https://mitz17.com/blog/</loc>
-    <lastmod>2026-03-03T18:05:00+09:00</lastmod>
-  </url><url>
-    <loc>https://mitz17.com/tags/%E8%87%AA%E5%8B%95%E5%8C%96/</loc>
     <lastmod>2026-03-03T18:05:00+09:00</lastmod>
   </url><url>
     <loc>https://mitz17.com/tags/cloudflare/</loc>
@@ -44,12 +62,6 @@
     <loc>https://mitz17.com/tags/%E3%83%A1%E3%83%BC%E3%83%AB/</loc>
     <lastmod>2026-03-02T12:00:00+09:00</lastmod>
   </url><url>
-    <loc>https://mitz17.com/tags/%E3%83%8E%E3%83%BC%E3%82%B3%E3%83%BC%E3%83%89/</loc>
-    <lastmod>2026-03-02T12:00:00+09:00</lastmod>
-  </url><url>
-    <loc>https://mitz17.com/categories/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88/</loc>
-    <lastmod>2026-03-02T12:00:00+09:00</lastmod>
-  </url><url>
     <loc>https://mitz17.com/tags/ffmpeg/</loc>
     <lastmod>2026-03-02T00:00:00+09:00</lastmod>
   </url><url>
@@ -57,9 +69,6 @@
     <lastmod>2026-03-02T00:00:00+09:00</lastmod>
   </url><url>
     <loc>https://mitz17.com/blog/mp3-lufs-normalizer-python/</loc>
-    <lastmod>2026-03-02T00:00:00+09:00</lastmod>
-  </url><url>
-    <loc>https://mitz17.com/tags/python/</loc>
     <lastmod>2026-03-02T00:00:00+09:00</lastmod>
   </url><url>
     <loc>https://mitz17.com/tags/tkinter/</loc>
@@ -72,9 +81,6 @@
     <lastmod>2026-03-01T11:17:14+09:00</lastmod>
   </url><url>
     <loc>https://mitz17.com/blog/my-first-post/</loc>
-    <lastmod>2026-03-01T11:17:14+09:00</lastmod>
-  </url><url>
-    <loc>https://mitz17.com/tags/%E5%B0%8E%E5%85%A5/</loc>
     <lastmod>2026-03-01T11:17:14+09:00</lastmod>
   </url><url>
     <loc>https://mitz17.com/page/</loc>
