@@ -1,0 +1,24 @@
+{{- $config := .Site.Params.article.share -}}
+{{- $shareTitle := "この記事をシェアする" -}}
+{{- with $config.title -}}
+    {{- $shareTitle = . -}}
+{{- end -}}
+{{- $encodedPermalink := .Permalink | urlquery -}}
+{{- $encodedTitle := .Title | plainify | htmlUnescape | urlquery -}}
+{{- $services := slice
+    (dict "id" "x" "label" "X (Twitter)" "href" (printf "https://twitter.com/intent/tweet?url=%s&text=%s" $encodedPermalink $encodedTitle))
+    (dict "id" "facebook" "label" "Facebook" "href" (printf "https://www.facebook.com/sharer/sharer.php?u=%s" $encodedPermalink))
+    (dict "id" "line" "label" "LINE" "href" (printf "https://social-plugins.line.me/lineit/share?url=%s" $encodedPermalink))
+    (dict "id" "hatena" "label" "はてブ" "href" (printf "https://b.hatena.ne.jp/add?mode=confirm&url=%s&title=%s" $encodedPermalink $encodedTitle))
+    (dict "id" "bluesky" "label" "Bluesky" "href" (printf "https://bsky.app/intent/compose?text=%s%%20%s" $encodedTitle $encodedPermalink))
+-}}
+<section class="article-share" aria-label="{{ $shareTitle }}">
+    <p class="article-share__title">{{ $shareTitle }}</p>
+    <div class="article-share__buttons">
+        {{- range $services }}
+            <a class="article-share__button article-share__button--{{ .id }}" href="{{ .href }}" target="_blank" rel="noopener noreferrer" aria-label="{{ .label }}でシェア">
+                {{- .label -}}
+            </a>
+        {{- end }}
+    </div>
+</section>

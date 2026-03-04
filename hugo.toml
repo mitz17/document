@@ -1,0 +1,51 @@
+baseURL = "https://mitz17.com/"
+relativeURLs = true
+languageCode = 'ja-jp'
+defaultContentLanguage = 'ja'
+title = 'もざぶれなるままに'
+theme = 'hugo-theme-stack'
+
+[params]
+  description = 'オブザーバビリティとSREの実践知をまとめる技術ブログ'
+  mainSections = ['blog']
+  favicon = 'images/favicon.png'
+
+  [params.article.share]
+    enabled = true
+    title = 'この記事をシェアする'
+
+  [params.article.random]
+    title = 'おすすめ記事'
+    count = 4
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[[menu.main]]
+  name = 'ホーム'
+  url = '/'
+  weight = 1
+
+[[menu.main]]
+  name = '記事一覧'
+  url = '/blog/'
+  weight = 2
+
+[[menu.main]]
+  name = 'プロフィール'
+  url = '/page/about/'
+  weight = 3
+
+[[menu.main]]
+  name = 'お問い合わせ'
+  url = '/page/contact/'
+  weight = 4
+
+[[menu.main]]
+  name = 'プライバシーポリシー'
+  url = '/page/privacy/'
+  weight = 5
+
+

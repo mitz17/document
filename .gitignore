@@ -1,0 +1,7 @@
+# Hugo build artifacts
+public/
+docs/
+resources/_gen/
+
+# Hugo lock file is regenerated automatically
+.hugo_build.lock
