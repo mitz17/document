@@ -127,3 +127,10 @@ completed = subprocess.run(command, check=False, capture_output=True, text=True)
 
 - Tkinter × ffmpeg という素朴な構成でも、音量正規化の面倒くささはかなり解消できる
 - 古い mp3 をまだまだ使いたい人は、ぜひ `mp3-normalizer` をクローンして遊んでみてください！
+
+## 2026-03-04 修正追記
+
+- `mp3-normalizer` を直列処理から並列処理対応に変更し、処理速度を大幅改善。
+- 実測で 145 件の MP3 処理が 670 秒から 207.3 秒になり、約 3.23 倍高速化（約 69.1% 短縮）を確認。(4並列)
+- あわせて ffmpeg 出力の文字コード処理を堅牢化し、Windows 環境での文字化け由来の失敗を起こしにくくしました。
+- CPU並列数の上限はお使いのCPUのコア数の上限としています。
