@@ -1,0 +1,32 @@
+<footer class="article-footer">
+    {{ partial "article/components/tags" . }}
+
+    {{- $shareEnabled := true -}}
+    {{- with .Site.Params.article.share -}}
+        {{- if eq .enabled false -}}
+            {{- $shareEnabled = false -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if eq .Params.share false -}}
+        {{- $shareEnabled = false -}}
+    {{- end -}}
+    {{- if $shareEnabled -}}
+        {{ partial "article/components/share" . }}
+    {{- end -}}
+
+    {{ if and (.Site.Params.article.license.enabled) (not (eq .Params.license false)) }}
+    <section class="article-copyright">
+        {{ partial "helper/icon" "copyright" }}
+        <span>{{ default .Site.Params.article.license.default .Params.license | markdownify }}</span>
+    </section>
+    {{ end }}
+
+    {{- if ne .Lastmod .Date -}}
+    <section class="article-lastmod">
+        {{ partial "helper/icon" "clock" }}
+        <span>
+            {{ T "article.lastUpdatedOn" }} {{ .Lastmod | time.Format .Site.Params.dateFormat.lastUpdated }}
+        </span>
+    </section>
+    {{- end -}}
+</footer>

@@ -1,0 +1,39 @@
+{{- $randomConfig := .Site.Params.article.random -}}
+{{- $count := 5 -}}
+{{- $title := T "article.relatedContent" -}}
+
+{{- with $randomConfig.count -}}
+    {{- $count = . -}}
+{{- end -}}
+{{- with $randomConfig.title -}}
+    {{- $title = . -}}
+{{- end -}}
+
+{{- $sections := slice -}}
+{{- with $randomConfig.sections -}}
+    {{- $sections = . -}}
+{{- else -}}
+    {{- with .Site.Params.mainSections -}}
+        {{- $sections = . -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $candidates := .Site.RegularPages -}}
+{{- if gt (len $sections) 0 -}}
+    {{- $candidates = where $candidates "Section" "in" $sections -}}
+{{- end -}}
+{{- $candidates = where $candidates "Permalink" "ne" .Permalink -}}
+
+{{- $random := first $count (shuffle $candidates) -}}
+{{- with $random }}
+<aside class="related-content--wrapper">
+    <h2 class="section-title">{{ $title }}</h2>
+    <div class="related-content related-content--compact">
+        <div class="article-list--compact">
+            {{ range . }}
+                {{ partial "article-list/compact" . }}
+            {{ end }}
+        </div>
+    </div>
+</aside>
+{{- end }}
