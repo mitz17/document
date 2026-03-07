@@ -1,9 +1,9 @@
 +++
-title = 'MP3音量を自動調整するツールをPythonで作る LUFS正規化開発ログ'
+title = '音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ'
 date = 2026-03-02T00:00:00+09:00
 draft = false
-description = 'Tkinter/ffmpeg を束ねた LUFS 正規化ツール「mp3-normalizer」の開発背景と実装ポイントを解説'
-tags = ['Python', 'Tkinter', 'ffmpeg', 'LUFS']
+description = 'pythonとffmpegで音量自動調整ツール「mp3-normalizer」 開発背景と実装ポイント'
+tags = ['Python', 'Tkinter', 'ffmpeg', 'LUFS','mp3']
 categories = ['プロジェクト']
 +++
 
@@ -143,3 +143,13 @@ completed = subprocess.run(command, check=False, capture_output=True, text=True)
   - mutagenライブラリを用いて正規化後ファイルへ、元ファイルの歌詞タグをコピーする処理を追加
 - 影響:
   - 正規化後も歌詞タグ情報を保持可能
+
+## 2026-03-08 修正追記
+- 静かなイントロで始まる曲のイントロ部分の音量が増大してしまう問題に対処しました。
+- 入力ビットレートを検出できた場合は、可能な限り同等のビットレートで出力するよう改善しました。再エンコード時の意図しない劣化を避けやすくしています。
+- 入力対象の拡張子を選べるようにしました。`mp3` 以外の音源もまとめて扱いやすくしています。
+- 出力形式も、`mp3` / `aac` / `flac` / `wav` / `ogg` を選択可能にしました。
+- `workers` の二重指定を解消し、並列数の管理を一本化しました。GUI と CLI で設定経路が分かれていても、最終的な扱いは同じになるよう整理しています。
+- アートワーク保持も強化しています。`ffmpeg` 側のマップ調整に加え、後段のタグ移植も組み合わせる二段構えにして、埋め込み画像が落ちにくいよう見直しました。
+
+- **なお、この記事では全体像を優先しているため、`ffmpeg` コマンド自体の細かい意味や 2pass `loudnorm` の引数設計は今後別記事でまとめる予定です。**
