@@ -3,7 +3,7 @@ title = '音楽の音量を自動調整するツールをPythonで作る LUFS正
 date = 2026-03-02T00:00:00+09:00
 draft = false
 description = 'pythonとffmpegで音量自動調整ツール「mp3-normalizer」 開発背景と実装ポイント'
-tags = ['Python', 'Tkinter', 'ffmpeg', 'LUFS','mp3']
+tags = ['Python', 'Tkinter', 'ffmpeg', 'LUFS','mp3','音声処理']
 categories = ['プロジェクト']
 +++
 
@@ -26,6 +26,8 @@ GitHub: [mitz17/mp3-normalizer](https://github.com/mitz17/mp3-normalizer)
 ## ffmpeg とは？
 
 映像・音声を扱う OSS の名作で、CLI から形式変換やトリミング、ノーマライズを一気に処理できます。`mp3-normalizer` では ffmpeg の `loudnorm` フィルタを呼び出して LUFS を調整していますが、コマンド一発で WAV/MP3/MP4 などほぼすべてのメディアを扱える万能ツールです。GUI から触るときも裏側ではこのコマンドが動いており、パラメータを変えれば True Peak の上限やターゲット LUFS を柔軟に切り替えられます。
+
+`loudnorm` のパラメータや `1pass / 2pass`、True Peak、LRA など ffmpeg 側の仕組みを先に整理したい場合は、[ffmpeg loudnorm 完全解説：LUFS正規化と2passノーマライズの仕組み](/blog/ffmpeg-loudnorm-guide/) にまとめています。
 
 ## 環境
 
@@ -152,4 +154,4 @@ completed = subprocess.run(command, check=False, capture_output=True, text=True)
 - `workers` の二重指定を解消し、並列数の管理を一本化しました。GUI と CLI で設定経路が分かれていても、最終的な扱いは同じになるよう整理しています。
 - アートワーク保持も強化しています。`ffmpeg` 側のマップ調整に加え、後段のタグ移植も組み合わせる二段構えにして、埋め込み画像が落ちにくいよう見直しました。
 
-- **なお、この記事では全体像を優先しているため、`ffmpeg` コマンド自体の細かい意味や 2pass `loudnorm` の引数設計は今後別記事でまとめる予定です。**
+- **なお、この記事では全体像を優先しているため、`ffmpeg` コマンド自体の細かい意味や 2pass `loudnorm` の引数設計は [ffmpeg loudnorm 完全解説：LUFS正規化と2passノーマライズの仕組み](/blog/ffmpeg-loudnorm-guide/) にまとめています。**
