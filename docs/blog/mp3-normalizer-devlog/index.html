@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja-jp" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Tkinter/ffmpeg を束ねた LUFS 正規化ツール「mp3-normalizer」の開発背景と実装ポイントを解説">
-<title>MP3音量を自動調整するツールをPythonで作る LUFS正規化開発ログ</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="pythonとffmpegで音量自動調整ツール「mp3-normalizer」 開発背景と実装ポイント">
+<title>音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ</title>
 
 
 <link rel="canonical" href="https://mitz17.com/blog/mp3-normalizer-devlog/">
@@ -12,14 +12,24 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.51bbf1ce24f77edff532a0abed84dd20364a30771816f60306d916a1f2e70719.css"><meta property='og:title' content="MP3音量を自動調整するツールをPythonで作る LUFS正規化開発ログ">
-<meta property='og:description' content="Tkinter/ffmpeg を束ねた LUFS 正規化ツール「mp3-normalizer」の開発背景と実装ポイントを解説">
+<link rel="stylesheet" href="../../scss/style.min.e731670fe2c43ab45128606953c51f39db5dd0641163153866865cff237902a0.css"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9771896688186188"
+     crossorigin="anonymous"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1KVENKRZF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-X1KVENKRZF');
+</script>
+<meta property='og:title' content="音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ">
+<meta property='og:description' content="pythonとffmpegで音量自動調整ツール「mp3-normalizer」 開発背景と実装ポイント">
 <meta property='og:url' content='https://mitz17.com/blog/mp3-normalizer-devlog/'>
 <meta property='og:site_name' content='もざぶれなるままに'>
-<meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='Python' /><meta property='article:tag' content='Tkinter' /><meta property='article:tag' content='ffmpeg' /><meta property='article:tag' content='LUFS' /><meta property='article:published_time' content='2026-03-02T00:00:00&#43;09:00'/><meta property='article:modified_time' content='2026-03-02T00:00:00&#43;09:00'/>
-<meta name="twitter:title" content="MP3音量を自動調整するツールをPythonで作る LUFS正規化開発ログ">
-<meta name="twitter:description" content="Tkinter/ffmpeg を束ねた LUFS 正規化ツール「mp3-normalizer」の開発背景と実装ポイントを解説">
-    <link rel="shortcut icon" href="/images/favicon.png" />
+<meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='Python' /><meta property='article:tag' content='Tkinter' /><meta property='article:tag' content='ffmpeg' /><meta property='article:tag' content='LUFS' /><meta property='article:tag' content='mp3' /><meta property='article:tag' content='音声処理' /><meta property='article:published_time' content='2026-03-02T00:00:00&#43;09:00'/><meta property='article:modified_time' content='2026-03-02T00:00:00&#43;09:00'/>
+<meta name="twitter:title" content="音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ">
+<meta name="twitter:description" content="pythonとffmpegで音量自動調整ツール「mp3-normalizer」 開発背景と実装ポイント">
+    <link rel="shortcut icon" href="../../images/favicon2.png" />
 
     </head>
     <body class="
@@ -58,7 +68,7 @@
         
         
         <div class="site-meta">
-            <h1 class="site-name"><a href="/">もざぶれなるままに</a></h1>
+            <h1 class="site-name"><a href="../../">もざぶれなるままに</a></h1>
             <h2 class="site-description"></h2>
         </div>
     </header><ol class="menu" id="main-menu">
@@ -66,7 +76,7 @@
         
         
         <li >
-            <a href='/' >
+            <a href='../../' >
                 
                 <span>ホーム</span>
             </a>
@@ -74,7 +84,7 @@
         
         
         <li >
-            <a href='/blog/' >
+            <a href='../../blog/' >
                 
                 <span>記事一覧</span>
             </a>
@@ -82,7 +92,7 @@
         
         
         <li >
-            <a href='/page/about/' >
+            <a href='../../page/about/' >
                 
                 <span>プロフィール</span>
             </a>
@@ -90,7 +100,7 @@
         
         
         <li >
-            <a href='/page/contact/' >
+            <a href='../../page/contact/' >
                 
                 <span>お問い合わせ</span>
             </a>
@@ -98,7 +108,7 @@
         
         
         <li >
-            <a href='/page/privacy/' >
+            <a href='../../page/privacy/' >
                 
                 <span>プライバシーポリシー</span>
             </a>
@@ -146,7 +156,7 @@
             
             
             
-            <a href="/categories/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88/" style="background-color: hsl(342, 60%, 84%); color: hsl(342, 60%, 15%);">
+            <a href="../../categories/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88/" style="background-color: hsl(342, 60%, 84%); color: hsl(342, 60%, 15%);">
                 プロジェクト
             </a>
         
@@ -155,12 +165,12 @@
 
     <div class="article-title-wrapper">
         <h2 class="article-title">
-            <a href="/blog/mp3-normalizer-devlog/">MP3音量を自動調整するツールをPythonで作る LUFS正規化開発ログ</a>
+            <a href="../../blog/mp3-normalizer-devlog/">音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ</a>
         </h2>
     
         
         <h3 class="article-subtitle">
-            Tkinter/ffmpeg を束ねた LUFS 正規化ツール「mp3-normalizer」の開発背景と実装ポイントを解説
+            pythonとffmpegで音量自動調整ツール「mp3-normalizer」 開発背景と実装ポイント
         </h3>
         
     </div>
@@ -218,6 +228,7 @@
 </ul>
 <h2 id="ffmpeg-とは">ffmpeg とは？
 </h2><p>映像・音声を扱う OSS の名作で、CLI から形式変換やトリミング、ノーマライズを一気に処理できます。<code>mp3-normalizer</code> では ffmpeg の <code>loudnorm</code> フィルタを呼び出して LUFS を調整していますが、コマンド一発で WAV/MP3/MP4 などほぼすべてのメディアを扱える万能ツールです。GUI から触るときも裏側ではこのコマンドが動いており、パラメータを変えれば True Peak の上限やターゲット LUFS を柔軟に切り替えられます。</p>
+<p><code>loudnorm</code> のパラメータや <code>1pass / 2pass</code>、True Peak、LRA など ffmpeg 側の仕組みを先に整理したい場合は、<a class="link" href="../../blog/ffmpeg-loudnorm-guide/" >ffmpeg loudnorm 完全解説：LUFS正規化と2passノーマライズの仕組み</a> にまとめています。</p>
 <h2 id="環境">環境
 </h2><ul>
 <li>OS: Windows 11（PowerShell）で動作確認済み</li>
@@ -301,7 +312,7 @@
 <li>再帰チェックや再エンコード強制のトグルで挙動を調整。</li>
 <li>「実行」を押すと進捗ログが流れ、完了すると結果をスクロールなしで確認できます。</li>
 </ol>
-<p><img src="/images/mp3-normalizer-gui.png" alt="mp3-normalizer GUI モックアップ" loading="lazy" style="border-radius:16px; box-shadow:0 8px 24px rgba(15,23,42,0.18);"></p>
+<p><img src="../../images/mp3-normalizer-gui.png" alt="mp3-normalizer GUI モックアップ" loading="lazy" style="border-radius:16px; box-shadow:0 8px 24px rgba(15,23,42,0.18);"></p>
 
     <blockquote>
         <p>GUI 全体をざっくり再現したモック。入力/出力、ターゲット LUFS、対象ファイル、ログまで 1 画面で見渡せます。</p>
@@ -312,6 +323,55 @@
 <li>Tkinter × ffmpeg という素朴な構成でも、音量正規化の面倒くささはかなり解消できる</li>
 <li>古い mp3 をまだまだ使いたい人は、ぜひ <code>mp3-normalizer</code> をクローンして遊んでみてください！</li>
 </ul>
+<h2 id="2026-03-04-修正追記">2026-03-04 修正追記
+</h2><ul>
+<li><code>mp3-normalizer</code> を直列処理から並列処理対応に変更し、処理速度を大幅改善。</li>
+<li>実測で 145 件の MP3 処理が 670 秒から 207.3 秒になり、約 3.23 倍高速化（約 69.1% 短縮）を確認。(4並列)</li>
+<li>設定可能なCPU並列数の上限はお使いのCPUのコア数の上限としています。</li>
+<li>あわせて ffmpeg 出力の文字コード処理を堅牢化し、Windows 環境での文字化け由来の失敗を起こしにくくしました。</li>
+</ul>
+<h2 id="2026-03-05-修正追記">2026-03-05 修正追記
+</h2><ul>
+<li>失敗点:
+<ul>
+<li><code>ffmpeg</code> による正規化時、歌詞タグの埋め込み・維持ができないケースを確認</li>
+</ul>
+</li>
+<li>対応:
+<ul>
+<li>mutagenライブラリを用いて正規化後ファイルへ、元ファイルの歌詞タグをコピーする処理を追加</li>
+</ul>
+</li>
+<li>影響:
+<ul>
+<li>正規化後も歌詞タグ情報を保持可能</li>
+</ul>
+</li>
+</ul>
+<h2 id="2026-03-08-修正追記">2026-03-08 修正追記
+</h2><ul>
+<li>
+<p>静かなイントロで始まる曲のイントロ部分の音量が増大してしまう問題に対処しました。</p>
+</li>
+<li>
+<p>入力ビットレートを検出できた場合は、可能な限り同等のビットレートで出力するよう改善しました。再エンコード時の意図しない劣化を避けやすくしています。</p>
+</li>
+<li>
+<p>入力対象の拡張子を選べるようにしました。<code>mp3</code> 以外の音源もまとめて扱いやすくしています。</p>
+</li>
+<li>
+<p>出力形式も、<code>mp3</code> / <code>aac</code> / <code>flac</code> / <code>wav</code> / <code>ogg</code> を選択可能にしました。</p>
+</li>
+<li>
+<p><code>workers</code> の二重指定を解消し、並列数の管理を一本化しました。GUI と CLI で設定経路が分かれていても、最終的な扱いは同じになるよう整理しています。</p>
+</li>
+<li>
+<p>アートワーク保持も強化しています。<code>ffmpeg</code> 側のマップ調整に加え、後段のタグ移植も組み合わせる二段構えにして、埋め込み画像が落ちにくいよう見直しました。</p>
+</li>
+<li>
+<p><strong>なお、この記事では全体像を優先しているため、<code>ffmpeg</code> コマンド自体の細かい意味や 2pass <code>loudnorm</code> の引数設計は <a class="link" href="../../blog/ffmpeg-loudnorm-guide/" >ffmpeg loudnorm 完全解説：LUFS正規化と2passノーマライズの仕組み</a> にまとめています。</strong></p>
+</li>
+</ul>
 
 </section>
 
@@ -320,19 +380,29 @@
     
     <section class="article-tags">
         
-            <a href="/tags/python/">Python</a>
+            <a href="../../tags/python/">Python</a>
         
-            <a href="/tags/tkinter/">Tkinter</a>
+            <a href="../../tags/tkinter/">Tkinter</a>
         
-            <a href="/tags/ffmpeg/">Ffmpeg</a>
+            <a href="../../tags/ffmpeg/">Ffmpeg</a>
         
-            <a href="/tags/lufs/">LUFS</a>
+            <a href="../../tags/lufs/">LUFS</a>
+        
+            <a href="../../tags/mp3/">Mp3</a>
+        
+            <a href="../../tags/%E9%9F%B3%E5%A3%B0%E5%87%A6%E7%90%86/">音声処理</a>
         
     </section>
-
-
-    </footer>
-
+<section class="article-share" aria-label="この記事をシェアする">
+    <p class="article-share__title">この記事をシェアする</p>
+    <div class="article-share__buttons">
+            <a class="article-share__button article-share__button--x" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fmitz17.com%2Fblog%2Fmp3-normalizer-devlog%2F&amp;text=%E9%9F%B3%E6%A5%BD%E3%81%AE%E9%9F%B3%E9%87%8F%E3%82%92%E8%87%AA%E5%8B%95%E8%AA%BF%E6%95%B4%E3%81%99%E3%82%8B%E3%83%84%E3%83%BC%E3%83%AB%E3%82%92Python%E3%81%A7%E4%BD%9C%E3%82%8B&#43;LUFS%E6%AD%A3%E8%A6%8F%E5%8C%96%E9%96%8B%E7%99%BA%E3%83%AD%E3%82%B0" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)でシェア">X (Twitter)</a>
+            <a class="article-share__button article-share__button--facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmitz17.com%2Fblog%2Fmp3-normalizer-devlog%2F" target="_blank" rel="noopener noreferrer" aria-label="Facebookでシェア">Facebook</a>
+            <a class="article-share__button article-share__button--line" href="https://social-plugins.line.me/lineit/share?url=https%3A%2F%2Fmitz17.com%2Fblog%2Fmp3-normalizer-devlog%2F" target="_blank" rel="noopener noreferrer" aria-label="LINEでシェア">LINE</a>
+            <a class="article-share__button article-share__button--hatena" href="https://b.hatena.ne.jp/add?mode=confirm&amp;url=https%3A%2F%2Fmitz17.com%2Fblog%2Fmp3-normalizer-devlog%2F&amp;title=%E9%9F%B3%E6%A5%BD%E3%81%AE%E9%9F%B3%E9%87%8F%E3%82%92%E8%87%AA%E5%8B%95%E8%AA%BF%E6%95%B4%E3%81%99%E3%82%8B%E3%83%84%E3%83%BC%E3%83%AB%E3%82%92Python%E3%81%A7%E4%BD%9C%E3%82%8B&#43;LUFS%E6%AD%A3%E8%A6%8F%E5%8C%96%E9%96%8B%E7%99%BA%E3%83%AD%E3%82%B0" target="_blank" rel="noopener noreferrer" aria-label="はてブでシェア">はてブ</a>
+            <a class="article-share__button article-share__button--bluesky" href="https://bsky.app/intent/compose?text=%E9%9F%B3%E6%A5%BD%E3%81%AE%E9%9F%B3%E9%87%8F%E3%82%92%E8%87%AA%E5%8B%95%E8%AA%BF%E6%95%B4%E3%81%99%E3%82%8B%E3%83%84%E3%83%BC%E3%83%AB%E3%82%92Python%E3%81%A7%E4%BD%9C%E3%82%8B&#43;LUFS%E6%AD%A3%E8%A6%8F%E5%8C%96%E9%96%8B%E7%99%BA%E3%83%AD%E3%82%B0%20https%3A%2F%2Fmitz17.com%2Fblog%2Fmp3-normalizer-devlog%2F" target="_blank" rel="noopener noreferrer" aria-label="Blueskyでシェア">Bluesky</a>
+    </div>
+</section></footer>
 
     
 </article>
@@ -340,7 +410,58 @@
     
 
     
-
+<aside class="related-content--wrapper">
+    <h2 class="section-title">おすすめ記事</h2>
+    <div class="related-content related-content--compact">
+        <div class="article-list--compact">
+            
+                <article>
+    <a href="../../blog/receive-email/">
+        <div class="article-details">
+            <h2 class="article-title">Cloudflare Email Routingで独自ドメインのメールを受信する</h2>
+            <footer class="article-time">
+                <time datetime='2026-03-02T12:00:00&#43;09:00'>2026年3月2日月曜日</time>
+            </footer>
+        </div>
+    </a>
+</article>
+            
+                <article>
+    <a href="../../blog/ffmpeg-loudnorm-guide/">
+        <div class="article-details">
+            <h2 class="article-title">ffmpeg loudnorm 完全解説：LUFS正規化と2passノーマライズの仕組み</h2>
+            <footer class="article-time">
+                <time datetime='2026-03-08T00:00:00&#43;09:00'>2026年3月8日日曜日</time>
+            </footer>
+        </div>
+    </a>
+</article>
+            
+                <article>
+    <a href="../../blog/power-automate-sharepoint-excel/">
+        <div class="article-details">
+            <h2 class="article-title">Power Automateで前月分をSharePoint→Excelへ送るときの落とし穴</h2>
+            <footer class="article-time">
+                <time datetime='2026-03-03T18:05:00&#43;09:00'>2026年3月3日火曜日</time>
+            </footer>
+        </div>
+    </a>
+</article>
+            
+                <article>
+    <a href="../../blog/get-chrome-driver-python/">
+        <div class="article-details">
+            <h2 class="article-title">Selenium使用時にChromeDriverを自動更新する方法</h2>
+            <footer class="article-time">
+                <time datetime='2026-03-04T00:00:00&#43;09:00'>2026年3月4日水曜日</time>
+            </footer>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
      
     
         
@@ -416,7 +537,7 @@
             </main>
         </div>
         
-<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+<script type="text/javascript" src="../../ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
 
 
     </body>

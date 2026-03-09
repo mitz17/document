@@ -12,14 +12,24 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 
 
-<link rel="stylesheet" href="/scss/style.min.e731670fe2c43ab45128606953c51f39db5dd0641163153866865cff237902a0.css"><meta property='og:title' content="404 Page not found">
+<link rel="stylesheet" href="./scss/style.min.e731670fe2c43ab45128606953c51f39db5dd0641163153866865cff237902a0.css"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9771896688186188"
+     crossorigin="anonymous"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1KVENKRZF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-X1KVENKRZF');
+</script>
+<meta property='og:title' content="404 Page not found">
 <meta property='og:description' content="オブザーバビリティとSREの実践知をまとめる技術ブログ">
 <meta property='og:url' content='https://mitz17.com/404.html'>
 <meta property='og:site_name' content='もざぶれなるままに'>
-<meta property='og:type' content='website'><meta property='og:updated_time' content=' 2026-03-04T00:00:00&#43;09:00 '/>
+<meta property='og:type' content='website'><meta property='og:updated_time' content=' 2026-03-08T00:00:00&#43;09:00 '/>
 <meta name="twitter:title" content="404 Page not found">
 <meta name="twitter:description" content="オブザーバビリティとSREの実践知をまとめる技術ブログ">
-    <link rel="shortcut icon" href="/images/favicon.png" />
+    <link rel="shortcut icon" href="./images/favicon2.png" />
 
     </head>
     <body class="">
@@ -56,7 +66,7 @@
         
         
         <div class="site-meta">
-            <h1 class="site-name"><a href="/">もざぶれなるままに</a></h1>
+            <h1 class="site-name"><a href="./">もざぶれなるままに</a></h1>
             <h2 class="site-description"></h2>
         </div>
     </header><ol class="menu" id="main-menu">
@@ -64,7 +74,7 @@
         
         
         <li >
-            <a href='/' >
+            <a href='./' >
                 
                 <span>ホーム</span>
             </a>
@@ -72,7 +82,7 @@
         
         
         <li >
-            <a href='/blog/' >
+            <a href='./blog/' >
                 
                 <span>記事一覧</span>
             </a>
@@ -80,7 +90,7 @@
         
         
         <li >
-            <a href='/page/about/' >
+            <a href='./page/about/' >
                 
                 <span>プロフィール</span>
             </a>
@@ -88,7 +98,7 @@
         
         
         <li >
-            <a href='/page/contact/' >
+            <a href='./page/contact/' >
                 
                 <span>お問い合わせ</span>
             </a>
@@ -96,7 +106,7 @@
         
         
         <li >
-            <a href='/page/privacy/' >
+            <a href='./page/privacy/' >
                 
                 <span>プライバシーポリシー</span>
             </a>
@@ -135,7 +145,41 @@
     <div class="not-found-card">
         <h1 class="article-title">404 Not Found</h1>
         <h2 class="article-subtitle">指定されたページは存在しません。</h2>
-    </div><footer class="site-footer">
+    </div><form action="./page/search/" class="search-form widget" data-json="/page/search/index.json">
+            <p>
+                <label>検索</label>
+                <input id="searchInput" name="keyword" required placeholder="入力..." />
+            
+                <button title="検索">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                </button>
+            </p>
+        </form>
+
+        <div class="search-result">
+            <h3 class="search-result--title section-title"></h3>
+            <div class="search-result--list article-list--compact"></div>
+        </div>
+        
+        <script>
+            window.searchResultTitleTemplate = "#PAGES_COUNT 件 （#TIME_SECONDS 秒）"
+        </script><script type="text/javascript" src="./ts/search.js" defer></script>
+
+        <script>
+            const wrongUrl = new URL(window.location.href);
+
+            
+            const searchKeyword = decodeURIComponent(wrongUrl.pathname).split(/[/|-]/).join(' ').trim();
+
+            document.getElementById('searchInput').setAttribute('value', searchKeyword);
+        </script><footer class="site-footer">
     <section class="copyright">
         &copy; 
         
@@ -152,7 +196,7 @@
             </main>
         </div>
         
-<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+<script type="text/javascript" src="./ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
 
 
     </body>
