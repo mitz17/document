@@ -5,6 +5,8 @@ draft = false
 description = 'pythonとffmpegで音量自動調整ツール「mp3-normalizer」 開発背景と実装ポイント'
 tags = ['Python', 'Tkinter', 'ffmpeg', 'LUFS','mp3','音声処理']
 categories = ['プロジェクト']
+slug = 'mp3-normalizer-devlog'
+aliases = ['/blog/mp3-lufs-normalizer-python/']
 +++
 
 GitHub: [mitz17/mp3-normalizer](https://github.com/mitz17/mp3-normalizer)
