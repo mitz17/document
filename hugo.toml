@@ -8,7 +8,7 @@ theme = 'hugo-theme-stack'
 [params]
   description = 'オブザーバビリティとSREの実践知をまとめる技術ブログ'
   mainSections = ['blog']
-  favicon = 'images/favicon.png'
+  favicon = 'images/favicon2.png'
 
   [params.article.share]
     enabled = true
