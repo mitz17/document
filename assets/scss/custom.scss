@@ -71,6 +71,16 @@
     .article-share__button--bluesky {
         background-color: #0085ff;
     }
+
+    .article-share__button--copy {
+        background-color: #2f855a;
+        color: #fff;
+        border-color: transparent;
+    }
+
+    .article-share__button--copy.article-share__button--copied {
+        background-color: #276749;
+    }
 }
 
 .related-content--wrapper {

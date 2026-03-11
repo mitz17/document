@@ -1,21 +1,20 @@
 baseURL = "https://mitz17.com/"
 relativeURLs = true
-languageCode = 'ja-jp'
+languageCode = "ja-jp"
 defaultContentLanguage = 'ja'
-title = 'もざぶれなるままに'
+title = "もざぶれなるままに"
 theme = 'hugo-theme-stack'
 
 [params]
-  description = 'オブザーバビリティとSREの実践知をまとめる技術ブログ'
   mainSections = ['blog']
-  favicon = 'images/favicon2.png'
+  favicon = "images/favicon2.png"
 
   [params.article.share]
     enabled = true
-    title = 'この記事をシェアする'
+    title = "この記事をシェアする"
 
   [params.article.random]
-    title = 'おすすめ記事'
+    title = "おすすめ記事"
     count = 4
 
 [markup]
@@ -23,29 +22,87 @@ theme = 'hugo-theme-stack'
     [markup.goldmark.renderer]
       unsafe = true
 
-[[menu.main]]
-  name = 'ホーム'
-  url = '/'
-  weight = 1
+[languages]
+  [languages.ja]
+    languageName = "日本語"
+    languageCode = "ja-JP"
+    weight = 1
+    title = "もざぶれなるままに"
 
-[[menu.main]]
-  name = '記事一覧'
-  url = '/blog/'
-  weight = 2
+    [languages.ja.params]
+      description = "オブザーバビリティとSREの実践知をまとめる技術ブログ"
 
-[[menu.main]]
-  name = 'プロフィール'
-  url = '/page/about/'
-  weight = 3
+    [languages.ja.params.article.share]
+      title = "この記事をシェアする"
 
-[[menu.main]]
-  name = 'お問い合わせ'
-  url = '/page/contact/'
-  weight = 4
+    [languages.ja.params.article.random]
+      title = "おすすめ記事"
+      count = 4
 
-[[menu.main]]
-  name = 'プライバシーポリシー'
-  url = '/page/privacy/'
-  weight = 5
+    [[languages.ja.menu.main]]
+      name = "ホーム"
+      url = "/"
+      weight = 1
+
+    [[languages.ja.menu.main]]
+      name = "記事一覧"
+      url = "/blog/"
+      weight = 2
+
+    [[languages.ja.menu.main]]
+      name = "プロフィール"
+      url = "/page/about/"
+      weight = 3
+
+    [[languages.ja.menu.main]]
+      name = "お問い合わせ"
+      url = "/page/contact/"
+      weight = 4
+
+    [[languages.ja.menu.main]]
+      name = "プライバシーポリシー"
+      url = "/page/privacy/"
+      weight = 5
+
+  [languages.en]
+    languageName = "English"
+    languageCode = "en-US"
+    weight = 2
+    title = "Mozabre As Idle Moments"
+
+    [languages.en.params]
+      description = "A practical tech blog on observability, SRE, automation, and hardware projects."
+
+    [languages.en.params.article.share]
+      title = "Share this article"
+
+    [languages.en.params.article.random]
+      title = "Recommended posts"
+      count = 4
+
+    [[languages.en.menu.main]]
+      name = "Home"
+      url = "/en/"
+      weight = 1
+
+    [[languages.en.menu.main]]
+      name = "Posts"
+      url = "/en/blog/"
+      weight = 2
+
+    [[languages.en.menu.main]]
+      name = "Profile"
+      url = "/en/about/"
+      weight = 3
+
+    [[languages.en.menu.main]]
+      name = "Contact"
+      url = "/en/contact/"
+      weight = 4
+
+    [[languages.en.menu.main]]
+      name = "Privacy Policy"
+      url = "/en/privacy/"
+      weight = 5
 
 

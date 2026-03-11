@@ -3,8 +3,16 @@
 {{- with $config.title -}}
     {{- $shareTitle = . -}}
 {{- end -}}
+{{- $copyLabel := "記事をクリップボードに追加する" -}}
+{{- $copyDoneLabel := "クリップボードに追加しました" -}}
+{{- if eq .Site.Language.Lang "en" -}}
+    {{- $copyLabel = "Copy Post Text" -}}
+    {{- $copyDoneLabel = "Copied to Clipboard" -}}
+{{- end -}}
 {{- $encodedPermalink := .Permalink | urlquery -}}
 {{- $encodedTitle := .Title | plainify | htmlUnescape | urlquery -}}
+{{- $postTitle := .Title | plainify | htmlUnescape -}}
+{{- $postBody := printf "%s\n%s" $postTitle .Permalink -}}
 {{- $services := slice
     (dict "id" "x" "label" "X (Twitter)" "href" (printf "https://twitter.com/intent/tweet?url=%s&text=%s" $encodedPermalink $encodedTitle))
     (dict "id" "facebook" "label" "Facebook" "href" (printf "https://www.facebook.com/sharer/sharer.php?u=%s" $encodedPermalink))
@@ -20,5 +28,59 @@
                 {{- .label -}}
             </a>
         {{- end }}
+        <button
+            class="article-share__button article-share__button--copy"
+            type="button"
+            data-clipboard-text="{{ $postBody }}"
+            data-copy-label="{{ $copyLabel }}"
+            data-copied-label="{{ $copyDoneLabel }}"
+            aria-label="{{ $copyLabel }}">
+            {{- $copyLabel -}}
+        </button>
     </div>
 </section>
+<script>
+(() => {
+  const buttons = document.querySelectorAll('.article-share__button--copy');
+  if (!buttons.length) return;
+
+  const fallbackCopy = (text) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'absolute';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    const success = document.execCommand('copy');
+    document.body.removeChild(textarea);
+    return success;
+  };
+
+  buttons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      const text = button.dataset.clipboardText || '';
+      const copyLabel = button.dataset.copyLabel || 'Copy';
+      const copiedLabel = button.dataset.copiedLabel || 'Copied';
+
+      let copied = false;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        }
+      } catch (_) {}
+
+      if (!copied) copied = fallbackCopy(text);
+      if (!copied) return;
+
+      button.textContent = copiedLabel;
+      button.classList.add('article-share__button--copied');
+      window.setTimeout(() => {
+        button.textContent = copyLabel;
+        button.classList.remove('article-share__button--copied');
+      }, 1800);
+    });
+  });
+})();
+</script>
