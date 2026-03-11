@@ -13,18 +13,24 @@
 {{- $encodedTitle := .Title | plainify | htmlUnescape | urlquery -}}
 {{- $postTitle := .Title | plainify | htmlUnescape -}}
 {{- $postBody := printf "%s\n%s" $postTitle .Permalink -}}
+{{- $shareText := printf "%s %s" $postTitle .Permalink | urlquery -}}
+{{- $facebookWebShare := printf "https://www.facebook.com/sharer/sharer.php?u=%s" $encodedPermalink -}}
 {{- $services := slice
-    (dict "id" "x" "label" "X (Twitter)" "href" (printf "https://twitter.com/intent/tweet?url=%s&text=%s" $encodedPermalink $encodedTitle))
-    (dict "id" "facebook" "label" "Facebook" "href" (printf "https://www.facebook.com/sharer/sharer.php?u=%s" $encodedPermalink))
-    (dict "id" "line" "label" "LINE" "href" (printf "https://social-plugins.line.me/lineit/share?url=%s" $encodedPermalink))
-    (dict "id" "hatena" "label" "はてブ" "href" (printf "https://b.hatena.ne.jp/add?mode=confirm&url=%s&title=%s" $encodedPermalink $encodedTitle))
+    (dict "id" "x" "label" "X (Twitter)" "href" (printf "https://twitter.com/intent/tweet?url=%s&text=%s" $encodedPermalink $encodedTitle) "appHref" (printf "twitter://post?message=%s" $shareText))
+    (dict "id" "facebook" "label" "Facebook" "href" $facebookWebShare "appHref" (printf "fb://facewebmodal/f?href=%s" ($facebookWebShare | urlquery)))
     (dict "id" "bluesky" "label" "Bluesky" "href" (printf "https://bsky.app/intent/compose?text=%s%%20%s" $encodedTitle $encodedPermalink))
 -}}
 <section class="article-share" aria-label="{{ $shareTitle }}">
     <p class="article-share__title">{{ $shareTitle }}</p>
     <div class="article-share__buttons">
         {{- range $services }}
-            <a class="article-share__button article-share__button--{{ .id }}" href="{{ .href }}" target="_blank" rel="noopener noreferrer" aria-label="{{ .label }}でシェア">
+            <a
+                class="article-share__button article-share__button--{{ .id }}"
+                href="{{ .href }}"
+                {{ with .appHref }}data-app-href="{{ . }}"{{ end }}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="{{ .label }}でシェア">
                 {{- .label -}}
             </a>
         {{- end }}
@@ -41,6 +47,23 @@
 </section>
 <script>
 (() => {
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+  const appShareButtons = document.querySelectorAll('.article-share__buttons a[data-app-href]');
+  appShareButtons.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      if (!isMobile) return;
+      const appHref = button.dataset.appHref || '';
+      const webHref = button.getAttribute('href') || '';
+      if (!appHref || !webHref) return;
+
+      event.preventDefault();
+      window.location.href = appHref;
+      window.setTimeout(() => {
+        window.location.href = webHref;
+      }, 700);
+    });
+  });
+
   const buttons = document.querySelectorAll('.article-share__button--copy');
   if (!buttons.length) return;
 
