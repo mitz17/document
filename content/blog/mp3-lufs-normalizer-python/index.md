@@ -3,7 +3,7 @@ title = 'Pythonとffmpegで音量自動調整ツールを作る｜LUFS正規化�
 date = 2026-03-02T00:00:00+09:00
 draft = false
 description = 'Python と ffmpeg で音量自動調整ツール「mp3-normalizer」を作った開発ログです。LUFS 正規化ツールの背景と実装ポイントを整理しました。'
-tags = ['Python', 'Tkinter', 'ffmpeg', 'LUFS','mp3','音声処理']
+tags = ['Python', 'ffmpeg', 'LUFS', 'mp3', '音声処理']
 categories = ['プロジェクト']
 slug = 'mp3-normalizer-devlog'
 aliases = ['/blog/mp3-lufs-normalizer-python/']
@@ -161,3 +161,8 @@ completed = subprocess.run(command, check=False, capture_output=True, text=True)
 - いったん Issue だけ立てておく予定です。手元が立て込んでいてすぐには追えないかもしれないので、もし直してくれる人がいたらかなり助かります。リポジトリはこちら: [mitz17/mp3-normalizer](https://github.com/mitz17/mp3-normalizer)
 
 - **なお、この記事では全体像を優先しているため、`ffmpeg` コマンド自体の細かい意味や 2pass `loudnorm` の引数設計は [ffmpeg loudnorm 完全解説：LUFS正規化と2passノーマライズの仕組み](/blog/ffmpeg-loudnorm-guide/) にまとめています。**
+
+## 関連記事
+
+- [【コマンド例あり】ffmpeg loudnormの使い方｜LUFS正規化と2pass設定を解説](/blog/ffmpeg-loudnorm-guide/)
+- [Ansysのバージョン選択ツールを作った理由｜古い解析ファイルを別バージョンで開くリスクを減らす](/blog/ansys-version-selector/)

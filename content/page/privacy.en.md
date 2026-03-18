@@ -9,6 +9,8 @@ aliases = ['/en/page/privacy/']
 
 This Privacy Policy was originally written in Japanese. If there is any discrepancy between language versions, the Japanese version shall prevail.
 
+This site is a personal tech blog run by mitz17 as a hobby. It publishes notes and experiments related to self-made tools, automation, and PC/software testing. The sections below explain how information is handled for contact inquiries, analytics, and advertising.
+
 ## Purpose of Using Personal Information
 
 On this blog, you may be asked to provide personal information such as your name (or handle) and email address when making inquiries or posting comments.

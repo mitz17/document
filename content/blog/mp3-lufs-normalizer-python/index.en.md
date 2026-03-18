@@ -3,7 +3,7 @@ title = 'Python MP3 Volume Normalizer with ffmpeg: LUFS Auto Normalization Guide
 date = 2026-03-02T00:00:00+09:00
 draft = false
 description = 'Development notes for mp3-normalizer, a Python and ffmpeg tool for automatic MP3 loudness normalization with LUFS. Built for batch volume fixes without memorizing ffmpeg commands.'
-tags = ['python', 'tkinter', 'ffmpeg', 'LUFS', 'mp3', 'audio-processing']
+tags = ['python', 'ffmpeg', 'LUFS', 'mp3', 'audio-processing']
 categories = ['project']
 slug = 'mp3-normalizer-devlog'
 aliases = ['/en/blog/mp3-lufs-normalizer-python/']
@@ -171,3 +171,8 @@ The process checks return codes for success/failure, and the same command string
 - I will at least open an Issue for it. I may not have time to investigate soon, so if someone wants to fix it, that would help a lot. Repository: [mitz17/mp3-normalizer](https://github.com/mitz17/mp3-normalizer)
 
 - For ffmpeg command-level details and 2-pass `loudnorm` parameter design, see [ffmpeg loudnorm Guide: LUFS Normalization, True Peak, and 2-Pass Settings](/en/blog/ffmpeg-loudnorm-guide/).
+
+## Related Posts
+
+- [How to Use ffmpeg loudnorm for LUFS Normalization](/en/blog/ffmpeg-loudnorm-guide/)
+- [Why I Built an Ansys Version Selector Tool | Reducing the Risk of Opening Old Simulation Files in the Wrong Version](/en/blog/ansys-version-selector/)

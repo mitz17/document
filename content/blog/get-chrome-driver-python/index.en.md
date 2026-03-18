@@ -237,3 +237,8 @@ If you call this before each test run, you can reliably fetch a matching ChromeD
 ## Final Notes
 
 The ChromeDriver distribution rules may change again in the future, so the code is structured so that only the parsing logic in `api.py` should need to change if the CfT API response format changes. Once version detection, download, and validation are automated, the time previously spent on Selenium setup can be used for actual test work instead.
+
+## Related Posts
+
+- [Why I Built an Ansys Version Selector Tool | Reducing the Risk of Opening Old Simulation Files in the Wrong Version](/en/blog/ansys-version-selector/)
+- [Python MP3 Volume Normalizer with ffmpeg: LUFS Auto Normalization Guide](/en/blog/mp3-normalizer-devlog/)

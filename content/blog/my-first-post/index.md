@@ -40,3 +40,9 @@ categories = ["お知らせ"]
 このブログの広告収益で、ドメインの維持費をまかなうこと。
 
 これが最初の10歩。
+
+## 関連記事
+
+- [【コマンド例あり】ffmpeg loudnormの使い方｜LUFS正規化と2pass設定を解説](/blog/ffmpeg-loudnorm-guide/)
+- [Ansysのバージョン選択ツールを作った理由｜古い解析ファイルを別バージョンで開くリスクを減らす](/blog/ansys-version-selector/)
+- [Ryzen 7600＋RTX 4070 Superの自作PC構成例｜購入価格16.3万円の実例紹介](/blog/dev-pc-build-ryzen7600-rtx4070s/)

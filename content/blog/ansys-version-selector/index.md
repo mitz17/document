@@ -3,7 +3,7 @@ title = "Ansysのバージョン選択ツールを作った理由｜古い解析
 date = 2026-03-18T11:00:00+09:00
 draft = false
 description = "Ansysを複数バージョン運用している環境で、意図しない版で解析ファイルを開くリスクを減らすために作った非公式のバージョン選択ツールを紹介します。Fluent・SpaceClaim・Workbenchに対応し、起動前に版を明示的に選べます。"
-tags = ["Ansys", "Fluent", "Workbench", "SpaceClaim", "Python", "tkinter"]
+tags = ["Ansys", "Fluent", "Workbench", "SpaceClaim", "Python"]
 categories = ["プロジェクト"]
 slug = "ansys-version-selector"
 +++
@@ -456,5 +456,10 @@ Ansys 本体の大きな機能追加ではなく、運用上の誤操作や取�
 
 やっていることは地味ですが、複数バージョン運用ではかなり実用的です。  
 同じように、Fluent や Workbench の版違いでヒヤッとしたことがあるなら、こういうワンクッションを入れるだけでもだいぶ楽になります。
+
+## 関連記事
+
+- [SeleniumでChromeDriverを自動取得する方法｜バージョン不一致対策](/blog/get-chrome-driver-python/)
+- [Ryzen 7600＋RTX 4070 Superの自作PC構成例｜購入価格16.3万円の実例紹介](/blog/dev-pc-build-ryzen7600-rtx4070s/)
 
 ※ Ansys、Ansys Fluent、Ansys SpaceClaim、Ansys Workbench は Ansys, Inc. またはその関連会社の商標または登録商標です。本記事は第三者による非公式な紹介です。

@@ -3,7 +3,7 @@ title = '【コマンド例あり】ffmpeg loudnormの使い方｜LUFS正規化�
 date = 2026-03-08T00:00:00+09:00
 draft = false
 description = 'ffmpeg の loudnorm フィルタで LUFS 正規化する方法を解説。1pass/2pass、True Peak、LRA、再エンコード、メタデータ保持まで実例付きでまとめました。'
-tags = ['ffmpeg', '音声処理', 'LUFS', 'mp3']
+tags = ['ffmpeg', 'loudnorm', 'LUFS', 'mp3']
 categories = ['プロジェクト']
 +++
 
@@ -424,3 +424,8 @@ ffmpeg -i input.mp3 \
 - ツール化するなら `print_format=json` と `-f null -` を使った測定フェーズが重要
 
 Python からまとめて処理したい場合や、GUI / CLI で自動化したい場合は、関連する実装メモを [音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ](/blog/mp3-lufs-normalizer-python/) に整理しています。
+
+## 関連記事
+
+- [Pythonとffmpegで音量自動調整ツールを作る｜LUFS正規化の開発ログ](/blog/mp3-lufs-normalizer-python/)
+- [Ryzen 7600＋RTX 4070 Superの自作PC構成例｜購入価格16.3万円の実例紹介](/blog/dev-pc-build-ryzen7600-rtx4070s/)

@@ -3,7 +3,7 @@ title = "How to Use ffmpeg loudnorm for LUFS Normalization"
 date = 2026-03-08T00:00:00+09:00
 draft = false
 description = "A practical guide to LUFS normalization with ffmpeg loudnorm, covering 1-pass vs 2-pass, True Peak, LRA, re-encoding, and how to preserve MP3 metadata and artwork."
-tags = ['ffmpeg', 'audio-processing', 'LUFS', 'mp3']
+tags = ['ffmpeg', 'loudnorm', 'LUFS', 'mp3']
 categories = ['project']
 +++
 
@@ -429,3 +429,8 @@ ffmpeg -i input.mp3 \
 - For tool development, measurement phase with `print_format=json` and `-f null -` is essential
 
 If you want Python-based automation with GUI/CLI, check [Python MP3 Volume Normalizer: LUFS Auto-Normalization with ffmpeg](/en/blog/mp3-normalizer-devlog/).
+
+## Related Posts
+
+- [Python MP3 Volume Normalizer with ffmpeg: LUFS Auto Normalization Guide](/en/blog/mp3-normalizer-devlog/)
+- [Ryzen 5 7600 and RTX 4070 Super PC Build: Parts, Price, and Why I Chose Them](/en/blog/dev-pc-build-ryzen7600-rtx4070s/)

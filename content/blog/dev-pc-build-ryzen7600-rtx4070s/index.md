@@ -5,8 +5,8 @@ date = 2026-03-05T00:00:00+09:00
 draft = false
 description = 'Ryzen 5 7600 と RTX 4070 Super で組んだ自作PCの構成と購入価格を紹介。開発、ローカルAI実験、軽めのゲームを想定した16.3万円構成の実例です。'
 image = '購入パーツ一式.jpg'
-tags = ['自作PC','Ryzen','RTX4070Super','Ubuntu','開発環境']
-categories = ['PC構成']
+tags = ['自作PC', 'Ryzen 5 7600', 'RTX 4070 Super', 'Ubuntu', '開発環境']
+categories = ['開発環境']
 +++
 
 2024年11月のブラックフライデーセールで購入した、少し前の構成です。  
@@ -97,3 +97,8 @@ HDDとSSDは既存資産を使い回し。
 - OS無料・既存ストレージ流用で節約
 
 結果として、開発もAIも現実的に回せる、満足度の高い17万円クラスのPCになった。
+
+## 関連記事
+
+- [Ansysのバージョン選択ツールを作った理由｜古い解析ファイルを別バージョンで開くリスクを減らす](/blog/ansys-version-selector/)
+- [Pythonとffmpegで音量自動調整ツールを作る｜LUFS正規化の開発ログ](/blog/mp3-lufs-normalizer-python/)

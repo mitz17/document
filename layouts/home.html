@@ -1,0 +1,60 @@
+{{ define "main" }}
+    {{- $featuredPaths := slice -}}
+    {{- if eq .Site.Language.Lang "ja" -}}
+        {{- $featuredPaths = slice
+            "/blog/ansys-version-selector/"
+            "/blog/ffmpeg-loudnorm-guide/"
+            "/blog/mp3-normalizer-devlog/"
+            "/blog/get-chrome-driver-python/"
+        -}}
+    {{- else if eq .Site.Language.Lang "en" -}}
+        {{- $featuredPaths = slice
+            "/en/blog/ansys-version-selector/"
+            "/en/blog/ffmpeg-loudnorm-guide/"
+            "/en/blog/mp3-normalizer-devlog/"
+            "/en/blog/get-chrome-driver-python/"
+        -}}
+    {{- end -}}
+
+    {{- $featuredPages := slice -}}
+    {{- range $featuredPaths -}}
+        {{- with $.Site.GetPage . -}}
+            {{- $featuredPages = $featuredPages | append . -}}
+        {{- end -}}
+    {{- end -}}
+
+    {{- if gt (len $featuredPages) 0 -}}
+        <section class="article-list">
+            <header>
+                <h3 class="section-title">
+                    {{- if eq .Site.Language.Lang "ja" -}}おすすめ記事{{- else -}}Featured Posts{{- end -}}
+                </h3>
+            </header>
+
+            {{ range $featuredPages }}
+                {{ partial "article-list/default" . }}
+            {{ end }}
+        </section>
+    {{- end -}}
+
+    {{- $paginator := partial "helper/paginator.html" . -}}
+    {{- $featuredSet := dict -}}
+    {{- range $featuredPages -}}
+        {{- $featuredSet = merge $featuredSet (dict .RelPermalink true) -}}
+    {{- end -}}
+
+    <section class="article-list">
+        {{ range $paginator.Pages }}
+            {{- if not (index $featuredSet .RelPermalink) -}}
+                {{ partial "article-list/default" . }}
+            {{- end -}}
+        {{ end }}
+    </section>
+
+    {{- partial "pagination.html" . -}}
+    {{- partial "footer/footer" . -}}
+{{ end }}
+
+{{ define "right-sidebar" }}
+    {{ partial "sidebar/right.html" (dict "Context" . "Scope" "homepage") }}
+{{ end }}

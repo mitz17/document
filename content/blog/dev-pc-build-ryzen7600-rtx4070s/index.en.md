@@ -5,8 +5,8 @@ date = 2026-03-05T00:00:00+09:00
 draft = false
 description = "A practical PC build using Ryzen 5 7600 and RTX 4070 Super for development, local AI experiments, and light gaming, with full parts list, total cost, and build rationale."
 image = "購入パーツ一式.jpg"
-tags = ["pc-build", "ryzen", "rtx4070super", "ubuntu", "dev-environment"]
-categories = ["pc-build"]
+tags = ["pc-build", "Ryzen 5 7600", "RTX 4070 Super", "Ubuntu", "dev-environment"]
+categories = ["dev-environment"]
 +++
 
 This is a slightly older build that I bought during the Black Friday sale in November 2024.  
@@ -101,3 +101,8 @@ This build was based on a simple rule: spend money only where it actually matter
 - Savings from Ubuntu and reused storage
 
 As a result, it turned into a very satisfying roughly 170,000 yen class machine that can handle both development work and local AI experiments in a realistic way.
+
+## Related Posts
+
+- [Why I Built an Ansys Version Selector Tool | Reducing the Risk of Opening Old Simulation Files in the Wrong Version](/en/blog/ansys-version-selector/)
+- [Python MP3 Volume Normalizer with ffmpeg: LUFS Auto Normalization Guide](/en/blog/mp3-normalizer-devlog/)

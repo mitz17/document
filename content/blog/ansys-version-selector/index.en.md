@@ -3,7 +3,7 @@ title = "Why I Built an Ansys Version Selector Tool | Reducing the Risk of Openi
 date = 2026-03-18T11:00:00+09:00
 draft = false
 description = "This article introduces an unofficial version selector tool I built for multi-version Ansys environments to reduce the risk of opening simulation files in an unintended version. It supports Fluent, SpaceClaim, and Workbench, and lets you explicitly choose the version before launch."
-tags = ["Ansys", "Fluent", "Workbench", "SpaceClaim", "Python", "tkinter"]
+tags = ["Ansys", "Fluent", "Workbench", "SpaceClaim", "Python"]
 categories = ["project"]
 slug = "ansys-version-selector"
 +++
@@ -375,5 +375,10 @@ So I made a small launcher that forces a version choice before launch.
 
 It is a modest tool, but in multi-version environments it is genuinely practical.  
 If you have ever felt uneasy about opening Fluent or Workbench files in the wrong release, even a small layer like this can make the workflow safer.
+
+## Related Posts
+
+- [How to Automatically Download the Right ChromeDriver for Selenium with Python](/en/blog/get-chrome-driver-python/)
+- [Ryzen 5 7600 and RTX 4070 Super PC Build: Parts, Price, and Why I Chose Them](/en/blog/dev-pc-build-ryzen7600-rtx4070s/)
 
 Ansys, Ansys Fluent, Ansys SpaceClaim, and Ansys Workbench are trademarks or registered trademarks of Ansys, Inc. or its affiliates. This article describes an unofficial third-party tool.

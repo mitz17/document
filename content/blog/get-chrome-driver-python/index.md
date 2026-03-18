@@ -239,3 +239,8 @@ driver = webdriver.Chrome(service=service)
 ## さいごに
 
 ChromeDriver の取得ルールは今後も変わる可能性があるため、CfT API の応答仕様が変わった際は `api.py` のパースロジックだけを差し替えれば再利用できる構成にしてあります。バージョン突き合わせから検証までを自動化しておけば、リグレッションテストの前準備にかかっていた時間を別の作業に割り当てられるはずです。
+
+## 関連記事
+
+- [Ansysのバージョン選択ツールを作った理由｜古い解析ファイルを別バージョンで開くリスクを減らす](/blog/ansys-version-selector/)
+- [Pythonとffmpegで音量自動調整ツールを作る｜LUFS正規化の開発ログ](/blog/mp3-lufs-normalizer-python/)

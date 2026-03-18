@@ -41,3 +41,9 @@ Still, I think it will be fun if that process itself remains as a log.
 Cover the domain maintenance fee with ad revenue from this blog.
 
 That's my first step.
+
+## Related Posts
+
+- [How to Use ffmpeg loudnorm for LUFS Normalization](/en/blog/ffmpeg-loudnorm-guide/)
+- [Why I Built an Ansys Version Selector Tool | Reducing the Risk of Opening Old Simulation Files in the Wrong Version](/en/blog/ansys-version-selector/)
+- [Ryzen 5 7600 and RTX 4070 Super PC Build: Parts, Price, and Why I Chose Them](/en/blog/dev-pc-build-ryzen7600-rtx4070s/)

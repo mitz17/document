@@ -9,6 +9,9 @@ theme = 'hugo-theme-stack'
   mainSections = ['blog']
   favicon = "images/favicon2.png"
 
+  [params.sidebar]
+    avatar = "images/favicon2.png"
+
   [params.article.share]
     enabled = true
     title = "この記事をシェアする"
@@ -30,7 +33,7 @@ theme = 'hugo-theme-stack'
     title = "もざぶれなるままに"
 
     [languages.ja.params]
-      description = "オブザーバビリティとSREの実践知をまとめる技術ブログ"
+      description = "自作ツール開発と業務自動化・効率化の実験ログをまとめる技術ブログ"
 
     [languages.ja.params.article.share]
       title = "この記事をシェアする"
@@ -71,7 +74,7 @@ theme = 'hugo-theme-stack'
     title = "Mozabre As Idle Moments"
 
     [languages.en.params]
-      description = "A practical tech blog on observability, SRE, automation, and hardware projects."
+      description = "A practical tech blog focused on self-made tools, workflow automation, and hands-on software/PC experiments."
 
     [languages.en.params.article.share]
       title = "Share this article"
