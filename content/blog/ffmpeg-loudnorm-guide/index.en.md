@@ -3,7 +3,7 @@ title = "How to Use ffmpeg loudnorm for LUFS Normalization"
 date = 2026-03-08T00:00:00+09:00
 draft = false
 description = "A practical guide to LUFS normalization with ffmpeg loudnorm, covering 1-pass vs 2-pass, True Peak, LRA, re-encoding, and how to preserve MP3 metadata and artwork."
-tags = ['ffmpeg', 'loudnorm', 'LUFS', 'mp3']
+tags = ['ffmpeg', 'loudnorm', 'LUFS', 'MP3']
 categories = ['project']
 +++
 
