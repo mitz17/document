@@ -1,8 +1,8 @@
 +++
-title = 'Cloudflare Email Routingで独自ドメインのメールを受信する'
+title = '【初心者向け】Cloudflare Email Routingの設定方法｜独自ドメインのメールをGmailで受信する手順'
 date = 2026-03-02T12:00:00+09:00
 draft = false
-description = 'Cloudflare Email Routing と Gmail を使って無料で独自ドメインのメールを受信したい'
+description = 'Cloudflare Email Routing を使って、独自ドメイン宛てのメールを Gmail で無料受信する設定手順を解説。サーバー不要で、ほぼノーコードで始められます。'
 tags = ['Cloudflare', 'メール']
 categories = ['プロジェクト']
 +++

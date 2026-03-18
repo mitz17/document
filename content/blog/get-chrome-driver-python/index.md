@@ -1,8 +1,8 @@
 +++
-title = 'Selenium使用時にChromeDriverを自動更新する方法'
+title = 'SeleniumでChromeDriverを自動取得する方法｜バージョン不一致対策'
 date = 2026-03-04T00:00:00+09:00
 draft = false
-description = 'ChromeDriverを自動取得するPythonツール get-chrome-driver の開発のきっかけ、処理ごとの動き、利用方法'
+description = 'Selenium 実行時の Chrome と ChromeDriver のバージョン不一致対策として、ChromeDriver を自動取得する Python ツールの背景と使い方を解説します。'
 tags = ['Python','Selenium','ChromeDriver','自動化','スクレイピング']
 categories = ['プロジェクト']
 +++

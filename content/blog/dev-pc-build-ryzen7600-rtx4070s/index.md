@@ -1,9 +1,9 @@
 ﻿+++
-title = 'Ryzen 7600 + RTX 4070 Super 自作PC構成と購入価格（16.3万円）'
+title = 'Ryzen 7600＋RTX 4070 Superの自作PC構成例｜購入価格16.3万円の実例紹介'
 slug = 'dev-pc-build-ryzen7600-rtx4070s'
 date = 2026-03-05T00:00:00+09:00
 draft = false
-description = '2024年11月ブラックフライデーで購入。Ryzen 5 7600とRTX 4070 Superで組んだ開発兼AI用途PCの構成と選定理由'
+description = 'Ryzen 5 7600 と RTX 4070 Super で組んだ自作PCの構成と購入価格を紹介。開発、ローカルAI実験、軽めのゲームを想定した16.3万円構成の実例です。'
 image = '購入パーツ一式.jpg'
 tags = ['自作PC','Ryzen','RTX4070Super','Ubuntu','開発環境']
 categories = ['PC構成']

@@ -1,8 +1,8 @@
 +++
-title = 'Python MP3 Volume Normalizer: LUFS Auto-Normalization with ffmpeg'
+title = 'Python MP3 Volume Normalizer with ffmpeg: LUFS Auto Normalization Guide'
 date = 2026-03-02T00:00:00+09:00
 draft = false
-description = 'Development notes for mp3-normalizer: an automatic audio normalization tool built with Python and ffmpeg.'
+description = 'Development notes for mp3-normalizer, a Python and ffmpeg tool for automatic MP3 loudness normalization with LUFS. Built for batch volume fixes without memorizing ffmpeg commands.'
 tags = ['python', 'tkinter', 'ffmpeg', 'LUFS', 'mp3', 'audio-processing']
 categories = ['project']
 slug = 'mp3-normalizer-devlog'

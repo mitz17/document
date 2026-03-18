@@ -1,8 +1,8 @@
 +++
-title = '音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ'
+title = 'Pythonとffmpegで音量自動調整ツールを作る｜LUFS正規化の開発ログ'
 date = 2026-03-02T00:00:00+09:00
 draft = false
-description = 'pythonとffmpegで音量自動調整ツール「mp3-normalizer」 開発背景と実装ポイント'
+description = 'Python と ffmpeg で音量自動調整ツール「mp3-normalizer」を作った開発ログです。LUFS 正規化ツールの背景と実装ポイントを整理しました。'
 tags = ['Python', 'Tkinter', 'ffmpeg', 'LUFS','mp3','音声処理']
 categories = ['プロジェクト']
 slug = 'mp3-normalizer-devlog'

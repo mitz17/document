@@ -1,8 +1,8 @@
 +++
-title = 'ffmpeg loudnorm 完全解説：LUFS正規化と2passノーマライズの仕組み'
+title = '【コマンド例あり】ffmpeg loudnormの使い方｜LUFS正規化と2pass設定を解説'
 date = 2026-03-08T00:00:00+09:00
 draft = false
-description = 'ffmpeg の loudnorm を使って LUFS 正規化する方法を、1pass / 2pass、True Peak、LRA、再エンコード、メタデータ保持までまとめて解説。'
+description = 'ffmpeg の loudnorm フィルタで LUFS 正規化する方法を解説。1pass/2pass、True Peak、LRA、再エンコード、メタデータ保持まで実例付きでまとめました。'
 tags = ['ffmpeg', '音声処理', 'LUFS', 'mp3']
 categories = ['プロジェクト']
 +++

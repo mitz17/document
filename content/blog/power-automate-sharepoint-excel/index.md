@@ -1,8 +1,8 @@
 +++
-title = 'Power Automateで前月分をSharePoint→Excelへ送るときの落とし穴'
+title = 'Power Automateで前月分データをSharePointからExcelへ出力する方法｜落とし穴も解説'
 date = 2026-03-03T18:05:00+09:00
 draft = false
-description = 'Power AutomateでSharePoint OnlineリストからExcelへデータを書き出すフローを作成した際にハマったポイントを解説。内部名(OData)、前月フィルター、Excelテーブル追加などの落とし穴をまとめました。'
+description = 'Power Automate で SharePoint Online リストの前月分データを Excel に出力する方法を解説。内部名、前月フィルター、Excel テーブル追加時の注意点もまとめています。'
 tags = ['Power Automate', 'SharePoint Online', 'Excel', '自動化', 'ワークフロー']
 categories = ['ノーコード']
 +++

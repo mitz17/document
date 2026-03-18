@@ -1,8 +1,8 @@
 +++
-title = 'How to Receive Email on a Custom Domain with Cloudflare Email Routing'
+title = 'How to Set Up Cloudflare Email Routing for a Custom Domain'
 date = 2026-03-02T12:00:00+09:00
 draft = false
-description = 'Set up free incoming email for a custom domain using Cloudflare Email Routing and Gmail.'
+description = 'Learn how to receive email on a custom domain for free using Cloudflare Email Routing and Gmail. No mail server setup required, and the process is almost entirely no-code.'
 tags = ['cloudflare', 'email']
 categories = ['project']
 +++

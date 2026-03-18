@@ -1,8 +1,8 @@
 +++
-title = "ffmpeg loudnorm Guide: LUFS Normalization, True Peak, and 2-Pass Settings"
+title = "How to Use ffmpeg loudnorm for LUFS Normalization"
 date = 2026-03-08T00:00:00+09:00
 draft = false
-description = "A practical guide to LUFS normalization with ffmpeg loudnorm, including 1-pass vs 2-pass, True Peak, LRA, re-encoding, and metadata retention."
+description = "A practical guide to LUFS normalization with ffmpeg loudnorm, covering 1-pass vs 2-pass, True Peak, LRA, re-encoding, and how to preserve MP3 metadata and artwork."
 tags = ['ffmpeg', 'audio-processing', 'LUFS', 'mp3']
 categories = ['project']
 +++
