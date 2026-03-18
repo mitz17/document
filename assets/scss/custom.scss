@@ -108,3 +108,22 @@
     }
 }
 
+@media (max-width: 1023px) {
+    .left-sidebar header {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .left-sidebar header .site-meta {
+        gap: 6px;
+    }
+
+    .left-sidebar header .site-name {
+        font-size: 1.4rem;
+    }
+
+    .left-sidebar header .site-description {
+        font-size: 1.2rem;
+    }
+}
+

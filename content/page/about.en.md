@@ -35,7 +35,7 @@ Whenever I make something that feels useful, I write about it here.
 ## Hardware at Heart
 
 I love software automation, but honestly I get even more excited when working with hardware.  
-Give me a soldering iron and a gadget, and I lose track of time.
+When I am doing electronics projects or tinkering with gadgets, I lose track of time.
 
 ## Contact
 

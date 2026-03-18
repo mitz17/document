@@ -1,13 +1,13 @@
 {{ define "main" }}
     {{- $featuredPaths := slice -}}
-    {{- if eq .Site.Language.Lang "ja" -}}
+    {{- if eq .Lang "ja" -}}
         {{- $featuredPaths = slice
             "/blog/ansys-version-selector/"
             "/blog/ffmpeg-loudnorm-guide/"
             "/blog/mp3-normalizer-devlog/"
             "/blog/get-chrome-driver-python/"
         -}}
-    {{- else if eq .Site.Language.Lang "en" -}}
+    {{- else if eq .Lang "en" -}}
         {{- $featuredPaths = slice
             "/en/blog/ansys-version-selector/"
             "/en/blog/ffmpeg-loudnorm-guide/"
@@ -17,9 +17,12 @@
     {{- end -}}
 
     {{- $featuredPages := slice -}}
-    {{- range $featuredPaths -}}
-        {{- with $.Site.GetPage . -}}
-            {{- $featuredPages = $featuredPages | append . -}}
+    {{- range $featuredPaths }}
+        {{- $target := . -}}
+        {{- range $.Site.RegularPages -}}
+            {{- if eq .RelPermalink $target -}}
+                {{- $featuredPages = $featuredPages | append . -}}
+            {{- end -}}
         {{- end -}}
     {{- end -}}
 
@@ -27,7 +30,7 @@
         <section class="article-list">
             <header>
                 <h3 class="section-title">
-                    {{- if eq .Site.Language.Lang "ja" -}}おすすめ記事{{- else -}}Featured Posts{{- end -}}
+                    {{- if eq .Lang "ja" -}}おすすめ記事（まず読むならこの4本）{{- else -}}Featured Posts (Start Here){{- end -}}
                 </h3>
             </header>
 
@@ -37,21 +40,28 @@
         </section>
     {{- end -}}
 
-    {{- $paginator := partial "helper/paginator.html" . -}}
-    {{- $featuredSet := dict -}}
-    {{- range $featuredPages -}}
-        {{- $featuredSet = merge $featuredSet (dict .RelPermalink true) -}}
-    {{- end -}}
-
     <section class="article-list">
-        {{ range $paginator.Pages }}
-            {{- if not (index $featuredSet .RelPermalink) -}}
-                {{ partial "article-list/default" . }}
-            {{- end -}}
-        {{ end }}
+        <article>
+            <div class="article-details">
+                <div class="article-title-wrapper">
+                    <h2 class="article-title">
+                        <a href="{{ if eq .Lang `ja` }}{{ `/blog/` | relLangURL }}{{ else }}{{ `/blog/` | relLangURL }}{{ end }}">
+                            {{- if eq .Lang "ja" -}}記事一覧を見る{{- else -}}Browse All Posts{{- end -}}
+                        </a>
+                    </h2>
+
+                    <h3 class="article-subtitle">
+                        {{- if eq .Lang "ja" -}}
+                            すべての記事を一覧で見たい場合はこちらからどうぞ。
+                        {{- else -}}
+                            Open the full post archive if you want to browse everything.
+                        {{- end -}}
+                    </h3>
+                </div>
+            </div>
+        </article>
     </section>
 
-    {{- partial "pagination.html" . -}}
     {{- partial "footer/footer" . -}}
 {{ end }}
 

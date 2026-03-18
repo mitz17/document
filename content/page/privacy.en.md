@@ -52,5 +52,6 @@ For program code published on GitHub and similar platforms, please follow the li
 
 This policy may be changed without prior notice. The latest version is always posted on this page.
 
-Established: February 27, 2026
-Revised: March 4, 2026
+Established: February 27, 2026  
+Revised: March 4, 2026  
+Revised: March 18, 2026
