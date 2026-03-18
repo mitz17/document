@@ -164,4 +164,10 @@ The process checks return codes for success/failure, and the same command string
 - Removed duplicate `workers` definitions and unified parallelism control across GUI/CLI paths.
 - Strengthened artwork retention using both ffmpeg mapping adjustments and post-tag migration.
 
+## Update: March 18, 2026
+
+- Known issue: roughly 1 out of 100 files may lose only the artist tag after normalization.
+- Even within the same album, some files keep the tag correctly while others do not, and I still have not confirmed a reliable reproduction pattern.
+- I will at least open an Issue for it. I may not have time to investigate soon, so if someone wants to fix it, that would help a lot. Repository: [mitz17/mp3-normalizer](https://github.com/mitz17/mp3-normalizer)
+
 - For ffmpeg command-level details and 2-pass `loudnorm` parameter design, see [ffmpeg loudnorm Guide: LUFS Normalization, True Peak, and 2-Pass Settings](/en/blog/ffmpeg-loudnorm-guide/).
