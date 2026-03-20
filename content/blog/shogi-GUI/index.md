@@ -11,6 +11,10 @@ categories = ['プロジェクト']
 
 この記事は、**「自前で将棋AIを作ろうプロジェクト」の第一弾**です。
 
+続き（第二弾）はこちらです。
+
+- [Pythonで自作した将棋AIと対局してみた｜学習前でも探索回数がかなり重要だった実装ログ](/blog/shogi-ai-before-training-matchlog/)
+
 将棋AIを作ろうとすると、
 「まず何から作るべきか？」で悩むと思います。
 
@@ -32,6 +36,10 @@ categories = ['プロジェクト']
 を確認しづらいです。
 
 ログだけ見て追うやり方もありますが、将棋みたいにルールが多いゲームではやはり盤面を直接見られる方が早い。ということで、この「自前で将棋AIを作ろうプロジェクト」の第一歩として、まずは将棋GUIを作りました。
+
+このあと実際に、**学習前の評価関数ベースAIと対局してみた記録** は次の記事にまとめています。
+
+- [将棋AIを強化学習前に対局テスト｜MCTSのsimulation数で強さが激変した開発ログ](/blog/shogi-ai-before-training-matchlog/)
 
 ## 最終目標は「自前の強化学習将棋AIを育てること」
 
@@ -201,11 +209,16 @@ def terminal_result(position: Position) -> TerminalResult:
 
 要するに第二弾は、**「評価関数を自作して強化学習0で対戦してみる」** になります。
 
+続き（第二弾）はこちらです。
+
+- [Pythonで自作した将棋AIと対局してみた｜学習前でも探索回数がかなり重要だった実装ログ](/blog/shogi-ai-before-training-matchlog/)
+
 その先では、どれだけ学習させたら自分（将棋ウォーズ初段）が敵わなくなるのか、そしてそこまで本当に自力で学習させられるのかを試してみたいと思っています。  
 今回は外部の棋譜や定石は学習させない前提なので、かなり遠回りになるはずですが、そのぶんどこまで伸びるのかは普通に楽しみです。
 
 ## 関連記事
 
+- [将棋AIを強化学習前に対局テスト｜MCTSのsimulation数で強さが激変した開発ログ](/blog/shogi-ai-before-training-matchlog/)
 - [Selenium使用時にChromeDriverを自動更新する方法](/blog/get-chrome-driver-python/)
 - [音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ](/blog/mp3-lufs-normalizer-python/)
 - [Power Automateで前月分をSharePoint→Excelへ送るときの落とし穴](/blog/power-automate-sharepoint-excel/)

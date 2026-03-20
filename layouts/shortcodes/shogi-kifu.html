@@ -1,0 +1,21 @@
+{{- $src := .Get "src" -}}
+{{- $title := .Get "title" | default "将棋棋譜ビューア" -}}
+{{- $blackLabel := .Get "blackLabel" | default "先手" -}}
+{{- $whiteLabel := .Get "whiteLabel" | default "後手" -}}
+{{- $resource := .Page.Resources.GetMatch $src -}}
+{{- if not $resource -}}
+  {{- errorf "shogi-kifu shortcode: resource %q not found in %q" $src .Page.File.Path -}}
+{{- end -}}
+<div
+  class="shogi-kifu-viewer"
+  data-title="{{ $title }}"
+  data-black-label="{{ $blackLabel }}"
+  data-white-label="{{ $whiteLabel }}"
+  data-ordinal="{{ .Ordinal }}"
+>
+  <div class="shogi-kifu-viewer__header">
+    <strong>{{ $title }}</strong>
+  </div>
+  <div class="shogi-kifu-viewer__app"></div>
+  <script type="text/plain" class="shogi-kifu-viewer__data">{{ $resource.Content }}</script>
+</div>
