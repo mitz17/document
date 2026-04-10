@@ -9,15 +9,15 @@ aliases = ['/en/page/about/']
 
 ## About This Site
 
-This site is a personal tech blog focused on Python and ffmpeg, with articles based on implementation and verification.  
-It covers topics such as audio processing, video processing, automation tools, and development logs, with an emphasis on things I have actually tested and reproduced myself.  
-Rather than summarizing information in the abstract, I focus on practical records that include code, commands, and repeatable steps.
+This site is a personal tech blog centered on Python and ffmpeg, with a strong focus on implementation, experimentation, and verification.  
+It covers topics such as custom tool development, automation, audio and video processing, and AI-related experiments, based on things I have actually tested myself.  
+Rather than publishing abstract summaries, I aim to document code, commands, and procedures in a way that other people can reproduce.
 
 ## About the Author
 
-I am an independent developer with a strong interest in Python-based automation, small tool development, and audio/video processing with ffmpeg.  
-I run this site to organize and preserve what I learn while building and testing things for myself.  
-The articles here are based on hands-on work rather than theory alone.
+I am an independent developer who enjoys solving everyday friction with simple systems and building things that actually work.  
+My main areas of interest are Python automation, audio and video processing with ffmpeg, local AI experimentation, and practical PC and development-environment setups.  
+I run this site to organize what I learn through hands-on work and to preserve that knowledge in a form I can reuse later.
 
 ## Main Topics on This Site
 
@@ -33,7 +33,7 @@ I place particular emphasis on code and workflows that are easy to reproduce.
 
 ### AI
 
-I also plan to cover local AI experiments, model runtime setup, and records of inference and validation work.  
+I also cover local AI experiments, model runtime setup, and records of inference and validation work.  
 The goal is to document real configurations and procedures, including what worked and what did not.
 
 ### Development Logs
