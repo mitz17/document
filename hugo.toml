@@ -53,7 +53,7 @@ theme = 'hugo-theme-stack'
       weight = 2
 
     [[languages.ja.menu.main]]
-      name = "プロフィール"
+      name = "About"
       url = "/page/about/"
       weight = 3
 
@@ -94,7 +94,7 @@ theme = 'hugo-theme-stack'
       weight = 2
 
     [[languages.en.menu.main]]
-      name = "Profile"
+      name = "About"
       url = "/en/about/"
       weight = 3
 
