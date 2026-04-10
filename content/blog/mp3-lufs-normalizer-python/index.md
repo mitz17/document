@@ -1,9 +1,10 @@
 +++
-title = 'Pythonとffmpegで音量自動調整ツールを作る｜LUFS正規化の開発ログ'
+title = 'MP3の音量がバラバラな問題、ffmpegで一発解決｜Python製ツールの使い方と仕組み'
 date = 2026-03-02T00:00:00+09:00
+lastmod = 2026-03-18T00:00:00+09:00
 draft = false
-description = 'Python と ffmpeg で音量自動調整ツール「mp3-normalizer」を作った開発ログです。LUFS 正規化ツールの背景と実装ポイントを整理しました。'
-tags = ['Python', 'ffmpeg', 'LUFS', 'MP3', '音声処理']
+description = 'MP3の音量バラつきを ffmpeg の loudnorm フィルタで一括正規化。Python 製 GUI／CLI ツール「mp3-normalizer」の使い方・セットアップ・実装ポイントを丸ごと解説します。'
+tags = ['Python', 'ffmpeg', 'LUFS', 'MP3', '音声処理', '音量正規化']
 categories = ['プロジェクト']
 slug = 'mp3-normalizer-devlog'
 aliases = ['/blog/mp3-lufs-normalizer-python/']
@@ -11,70 +12,108 @@ aliases = ['/blog/mp3-lufs-normalizer-python/']
 
 GitHub: [mitz17/mp3-normalizer](https://github.com/mitz17/mp3-normalizer)
 
-## 背景
+## MP3の音量がバラバラで困っていませんか？
 
-10 年くらい前に作った mp3 をふと再生したら「え、なんか音ちいさくない？」となりました。コピペの荒波に飲まれてビットレートが劣化したのかと疑ったものの、音質自体は悪くなっていない。つまりファイルそのものはまだ元気だけれど、音声レベルが不揃いなままだと今後も安心して使えない──そう実感したのがこのツールを作るきっかけでした。
+昔作った MP3 を久しぶりに再生したら「あれ、音ちいさくない？」と感じたことはありませんか。ファイル自体は壊れていないのに、曲ごとに音量がまちまちで、再生のたびにボリュームを手動調整している──そんな悩みを **ffmpeg の `loudnorm` フィルタ** と **Python 製ツール「mp3-normalizer」** で丸ごと解決します。
 
-## 対象読者
+このツールでできることを先にまとめます。
 
-- 古い mp3 アーカイブを今も大切にしていて、音量だけさっと手直ししたい人
-- `ffmpeg` の呪文を暗記していないけど、まとめて正規化したい人
+- フォルダ内の MP3 を **まとめて -14 LUFS に正規化**（業界標準値）
+- **GUI でも CLI でも** 同じエンジンで処理できる
+- ID3 タグ・歌詞・アートワークを保ったまま再エンコード
+- 処理済み履歴を JSON で管理し、**二重処理・上書きを自動防止**
 
-## 前提（Python と mp3）
+---
 
-- Python 3.11 以上 + ffmpeg 6.x が動作する環境が存在していること。ffmpeg の導入は [この Qiita 記事](https://qiita.com/Tadataka_Takahashi/items/9dcb0cf308db6f5dc31b) を参考にして OS ごとの手順を順番にたどれば OK。
-- 正規化したい `.mp3` をフォルダごと用意しておき、WAV などは事前に変換しておく。
+## ffmpeg の `loudnorm` とは？
 
-## ffmpeg とは？
+`loudnorm` は ffmpeg に組み込まれた音量正規化フィルタです。波形のピーク値ではなく **LUFS（Loudness Units Full Scale）** という人間の聴感に近い指標を基準にするため、曲ごとの「うるさい・静かすぎる」問題を自然に解消できます。
 
-映像・音声を扱う OSS の名作で、CLI から形式変換やトリミング、ノーマライズを一気に処理できます。`mp3-normalizer` では ffmpeg の `loudnorm` フィルタを呼び出して LUFS を調整していますが、コマンド一発で WAV/MP3/MP4 などほぼすべてのメディアを扱える万能ツールです。GUI から触るときも裏側ではこのコマンドが動いており、パラメータを変えれば True Peak の上限やターゲット LUFS を柔軟に切り替えられます。
+パラメータや 1pass / 2pass の仕組みを先に把握したい場合は、[ffmpeg loudnorm 完全解説：LUFS正規化と2passノーマライズの仕組み](/blog/ffmpeg-loudnorm-guide/)にまとめています。
 
-`loudnorm` のパラメータや `1pass / 2pass`、True Peak、LRA など ffmpeg 側の仕組みを先に整理したい場合は、[ffmpeg loudnorm 完全解説：LUFS正規化と2passノーマライズの仕組み](/blog/ffmpeg-loudnorm-guide/) にまとめています。
+---
 
-## 環境
+## 対象読者・前提環境
 
-- OS: Windows 11（PowerShell）で動作確認済み
-- Python: 3.11.7（`python -m venv .venv` 推奨）
-- ffmpeg: 6.1 系（`ffmpeg -version` で確認）
-- GUI: Tkinter + ttk を素朴に使用
+- 古い MP3 アーカイブを大切にしていて、**音量だけさっと手直ししたい**人
+- `ffmpeg` のコマンドを覚えていないけど、まとめて処理したい人
+- Python が書ける人で、実装の中身まで確認したい人
 
-## ゴール
+動作には **Python 3.11 以上** と **ffmpeg 6.x** が必要です。ffmpeg の導入は [この Qiita 記事](https://qiita.com/Tadataka_Takahashi/items/9dcb0cf308db6f5dc31b) を OS ごとに手順をたどれば OK です。正規化したい `.mp3` はフォルダにまとめておいてください（WAV など他形式は事前に変換するか、後述の拡張子設定で対応できます）。
 
-- OS を問わず、誰でも同じ LUFS 正規化フローを踏める
-- GUI でも CLI でも結果が揃い、履歴とログで説明責任を果たせる
-- 「入力フォルダを置き換えたら音が揃う」を日常運用に落とし込む
+---
 
-## プロジェクトの概要
+## セットアップ
 
-- Python 3.11 + ffmpeg 6.x の軽量構成
-- GUI/CLI 共通のエンジン (`processor.py`) と再利用しやすいユーティリティ (`utils.py`)
-- `processed_history.json` で二重実行を抑止し、`mp3_normalizer.log` で証跡を残す
-- `loudnorm` 1pass を使い、-14 LUFS / -1 dBFS をデフォルトターゲットに設定
+```bash
+# 1. リポジトリを取得
+git clone https://github.com/mitz17/mp3-normalizer
 
-## どんな課題を解いているのか
+# 2. 仮想環境を作成・有効化
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\Activate.ps1
 
-- 古いファイルでも音質は十分なので、音量だけ揃えればまだまだ使える
-- `ffmpeg` のコマンドを忘れても GUI のプルダウンで完結する
-- いつどのファイルを処理したかがログで追えるので、再録や差し戻しが怖くない
+# 3. 依存パッケージをインストール
+pip install -r requirements.txt
 
-## セットアップの流れ
+# 4. 起動
+python main.py                   # GUI モード
+python main.py --cli ...         # CLI バッチ処理
+```
 
-1. `git clone https://github.com/mitz17/mp3-normalizer` でソースを取得
-2. `python -m venv .venv && source .venv/bin/activate`（Windows は `Activate.ps1`）
-3. `pip install -r requirements.txt` で依存をインストール
-4. `python main.py` で GUI、`python main.py --cli ...` でバッチ処理を実行
-5. 出力ディレクトリに並んだ MP3 を聴き比べ、ログファイルで値を確認
+---
 
-## アーキテクチャと実装メモ
+## 使い方：GUI 編
 
-- `gui.py` は Tkinter の `Frame` を積み上げ、別スレッドで ffmpeg を呼び出し UI フリーズを回避
-- `processor.py` は `Path.rglob('*.mp3')` で対象を探し、衝突しそうなファイルは `_1`, `_2` とサフィックスを付加
-- `-map_metadata 0` で ID3 タグを保ったまま再エンコード
-- ログはプレーンテキストに連ね、LUFS 値や実行コマンドを丸ごと保存
+1. **入力・出力ディレクトリを指定**すると、対象 MP3 がリストに表示されます。
+2. **LUFS と True Peak を入力**。迷ったらデフォルト（-14 LUFS / -1 dBFS）のままで OK。
+3. **再帰チェック**（サブフォルダを含むか）や**強制再エンコード**のトグルで挙動を調整。
+4. 「**実行**」を押すと進捗ログがリアルタイムで流れ、完了後に結果を確認できます。
 
-## コードのざっくり解説
+<p><img src="/images/mp3-normalizer-gui.png" alt="mp3-normalizer GUI" loading="lazy" style="border-radius:16px; box-shadow:0 8px 24px rgba(15,23,42,0.18);"></p>
 
-`processor.py` の `AudioProcessor.process_directory` では、入力ディレクトリを走査して計画を立て、重複チェックと安全な出力名の生成を行っています（[GitHub の該当コード](https://github.com/mitz17/mp3-normalizer/blob/main/processor.py#L180-L232) から抜粋）。
+> 入力/出力パス・ターゲット LUFS・対象ファイル一覧・ログを 1 画面で確認できます。
+
+---
+
+## 使い方：CLI 編
+
+GUI なしでバッチ処理したいときはこちら。スクリプトやタスクスケジューラと組み合わせやすいです。
+
+```bash
+# 基本（入力・出力ディレクトリを指定）
+python main.py --cli --input ./music_in --output ./music_out
+
+# LUFS と True Peak を変更する場合
+python main.py --cli --input ./music_in --output ./music_out --lufs -16 --tp -1.5
+
+# 並列数を指定（デフォルトは CPU コア数）
+python main.py --cli --input ./music_in --output ./music_out --workers 4
+
+# 対象拡張子と出力形式を変更
+python main.py --cli --input ./music_in --output ./music_out --ext flac --format aac
+```
+
+処理結果は `mp3_normalizer.log` に記録され、実行した ffmpeg コマンドごとの LUFS 値も残ります。
+
+---
+
+## 実装のポイント
+
+### アーキテクチャ概要
+
+```
+main.py
+├── gui.py        ─ Tkinter + ttk。別スレッドで ffmpeg を呼び出し UI フリーズを回避
+├── processor.py  ─ GUI / CLI 共通エンジン。ファイル走査・重複回避・正規化を担当
+└── utils.py      ─ パス生成・ログ整形などの汎用ユーティリティ
+```
+
+処理済みファイルは `processed_history.json` にサイズ・更新日時で記録され、再実行時に自動スキップされます。デフォルト（`force=False`）では既存ファイルへの上書きも行いません。
+
+### ファイル走査と重複回避
+
+`processor.py` の `AudioProcessor.process_directory` では、入力ディレクトリを走査して処理計画を立て、衝突しそうなファイル名に `_1`, `_2` のサフィックスを付加します（[GitHub の該当コード](https://github.com/mitz17/mp3-normalizer/blob/main/processor.py#L180-L232)）。
 
 ```python
 for index, entry in enumerate(plan.entries, start=1):
@@ -96,9 +135,9 @@ for index, entry in enumerate(plan.entries, start=1):
 self.history_service.save()
 ```
 
-このループで `generate_unique_output_path` が既存ファイルを検知すると `_1`, `_2` …を末尾に付与するので、デフォルト (`force=False`) では上書きされません。さらに `HistoryService` が `processed_history.json` にサイズ・更新日時を記録し、同じファイルを再度見つけてもスキップします。まさに「上書きしない設定なので安心」という設計です。
+### ffmpeg コマンドの組み立て
 
-実際に ffmpeg を叩くのは `FfmpegExecutor.normalize` で、コマンド全体を整形してログに残します（[コードはこちら](https://github.com/mitz17/mp3-normalizer/blob/main/processor.py#L63-L111)）。
+実際に ffmpeg を叩くのは `FfmpegExecutor.normalize`（[コードはこちら](https://github.com/mitz17/mp3-normalizer/blob/main/processor.py#L63-L111)）。コマンド全体をログに残すため、GUI からでも「裏で何をしているか」が一目でわかります。
 
 ```python
 command = [
@@ -114,53 +153,28 @@ self.logger.info("ffmpeg コマンド: %s", command_str)
 completed = subprocess.run(command, check=False, capture_output=True, text=True)
 ```
 
-`subprocess.run` の戻り値で成功/失敗を判断しており、GUI のログ欄にも同じコマンド文字列が流れるため、裏で何をしているかが一目で分かります。
+`-map_metadata 0` で ID3 タグをそのまま引き継ぎ、mutagen ライブラリで歌詞タグを後から上書きコピーすることで、ffmpeg だけでは落ちてしまうタグも保持します。
 
-## GUI の操作感
+---
 
-1. 入力・出力ディレクトリを指定すると、対象 MP3 がリストでずらっと表示されます。
-2. LUFS と True Peak を入力。迷ったらデフォルト（-14 / -1）のままで OK。
-3. 再帰チェックや再エンコード強制のトグルで挙動を調整。
-4. 「実行」を押すと進捗ログが流れ、完了すると結果をスクロールなしで確認できます。
+## アップデート履歴
 
-<p><img src="/images/mp3-normalizer-gui.png" alt="mp3-normalizer GUI モックアップ" loading="lazy" style="border-radius:16px; box-shadow:0 8px 24px rgba(15,23,42,0.18);"></p>
+| 日付 | 内容 |
+|------|------|
+| 2026-03-04 | 直列処理 → 並列処理対応。145 件の処理が 670 秒 → 207 秒（約 3.2 倍高速化）。Windows での文字コード処理を堅牢化 |
+| 2026-03-05 | mutagen を用いた歌詞タグのコピー処理を追加。正規化後も歌詞を保持可能に |
+| 2026-03-08 | 静かなイントロでの音量増大を抑制。入力ビットレートを検出して同等ビットレートで出力。入力拡張子・出力形式（mp3 / aac / flac / wav / ogg）を選択可能に。アートワーク保持を二段構えで強化 |
+| 2026-03-18 | **既知の不具合**：100 曲に 1 曲程度の割合でアーティストタグが消えるケースを確認。同一アルバム内でも再現条件が定まらず調査中。Issue を立てる予定。[修正に協力いただける方はこちら](https://github.com/mitz17/mp3-normalizer) |
 
-> GUI 全体をざっくり再現したモック。入力/出力、ターゲット LUFS、対象ファイル、ログまで 1 画面で見渡せます。
+---
 
 ## まとめ
 
-- Tkinter × ffmpeg という素朴な構成でも、音量正規化の面倒くささはかなり解消できる
-- 古い mp3 をまだまだ使いたい人は、ぜひ `mp3-normalizer` をクローンして遊んでみてください！
+- Tkinter × ffmpeg という素朴な構成でも、MP3 音量の正規化はかなり快適にできる
+- GUI で直感操作・CLI でバッチ自動化、どちらでも同じ品質に揃えられる
+- 古い MP3 をまだまだ活用したい人は、ぜひ `mp3-normalizer` をクローンしてみてください
 
-## 2026-03-04 修正追記
-
-- `mp3-normalizer` を直列処理から並列処理対応に変更し、処理速度を大幅改善。
-- 実測で 145 件の MP3 処理が 670 秒から 207.3 秒になり、約 3.23 倍高速化（約 69.1% 短縮）を確認。(4並列)
-- 設定可能なCPU並列数の上限はお使いのCPUのコア数の上限としています。
-- あわせて ffmpeg 出力の文字コード処理を堅牢化し、Windows 環境での文字化け由来の失敗を起こしにくくしました。
-
-## 2026-03-05 修正追記
-
-- 失敗点:
-  - `ffmpeg` による正規化時、歌詞タグの埋め込み・維持ができないケースを確認
-- 対応:
-  - mutagenライブラリを用いて正規化後ファイルへ、元ファイルの歌詞タグをコピーする処理を追加
-- 影響:
-  - 正規化後も歌詞タグ情報を保持可能
-
-## 2026-03-08 修正追記
-- 静かなイントロで始まる曲のイントロ部分の音量が増大してしまう問題に対処しました。
-- 入力ビットレートを検出できた場合は、可能な限り同等のビットレートで出力するよう改善しました。再エンコード時の意図しない劣化を避けやすくしています。
-- 入力対象の拡張子を選べるようにしました。`mp3` 以外の音源もまとめて扱いやすくしています。
-- 出力形式も、`mp3` / `aac` / `flac` / `wav` / `ogg` を選択可能にしました。
-- `workers` の二重指定を解消し、並列数の管理を一本化しました。GUI と CLI で設定経路が分かれていても、最終的な扱いは同じになるよう整理しています。
-- アートワーク保持も強化しています。`ffmpeg` 側のマップ調整に加え、後段のタグ移植も組み合わせる二段構えにして、埋め込み画像が落ちにくいよう見直しました。
-
-## 2026-03-18 追記
-- 既知の不具合として、100曲に1曲くらいの割合でアーティスト情報のタグだけ消えるファイルがあります。同じアルバム内でも正常にタグが残るものと消えるものがあり、現時点では再現条件をまだ特定できていません。
-- いったん Issue だけ立てておく予定です。手元が立て込んでいてすぐには追えないかもしれないので、もし直してくれる人がいたらかなり助かります。リポジトリはこちら: [mitz17/mp3-normalizer](https://github.com/mitz17/mp3-normalizer)
-
-- **なお、この記事では全体像を優先しているため、`ffmpeg` コマンド自体の細かい意味や 2pass `loudnorm` の引数設計は [ffmpeg loudnorm 完全解説：LUFS正規化と2passノーマライズの仕組み](/blog/ffmpeg-loudnorm-guide/) にまとめています。**
+---
 
 ## 関連記事
 

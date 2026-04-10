@@ -1,5 +1,5 @@
 +++
-title = "How to Use ffmpeg loudnorm for LUFS Normalization"
+title = "How to Use ffmpeg loudnorm: LUFS Normalization and 2-Pass Settings Explained"
 date = 2026-03-08T00:00:00+09:00
 draft = false
 description = "A practical guide to LUFS normalization with ffmpeg loudnorm, covering 1-pass vs 2-pass, True Peak, LRA, re-encoding, and how to preserve MP3 metadata and artwork."
@@ -9,66 +9,59 @@ categories = ['project']
 
 ## What This Article Covers
 
-This article explains how to normalize audio loudness with LUFS using ffmpeg's `loudnorm` filter.
+This article explains how to normalize audio loudness with ffmpeg's `loudnorm` filter using LUFS-based targets.
 
-Instead of only pasting commands, it also covers:
+Instead of just pasting commands, it also covers:
 
-- What `LUFS` is
-- What `ffmpeg` is
-- Core parameters of loudness normalization
+- What `LUFS` means
+- The main `loudnorm` parameters
+- When to use `1-pass` vs `2-pass`
 - Why re-encoding is required after normalization
-- How to keep MP3 metadata and artwork as much as possible
+- Basic settings that make MP3 metadata and artwork easier to preserve
 
-For an implementation-focused write-up about batch normalization from Python, see [Python MP3 Volume Normalizer: LUFS Auto-Normalization with ffmpeg](/en/blog/mp3-normalizer-devlog/).
+For a Python-based implementation that batch-processes files through ffmpeg, see [Python MP3 Volume Normalizer with ffmpeg: How It Works and How to Use It](/en/blog/mp3-normalizer-devlog/).
 
 ## Table of Contents
 
-- [Target Audience](#target-audience)
 - [Prerequisites](#prerequisites)
-- [What is LUFS?](#what-is-lufs)
-- [What is ffmpeg?](#what-is-ffmpeg)
-- [Key loudnorm Parameters](#key-loudnorm-parameters)
-- [1-Pass vs 2-Pass](#1-pass-vs-2-pass)
-- [Why Introductions Can Sound Louder After loudnorm](#why-introductions-can-sound-louder-after-loudnorm)
-- [Re-Encoding Is Required](#re-encoding-is-required)
-- [Keep Tags and Artwork with Stream Mapping](#keep-tags-and-artwork-with-stream-mapping)
-- [Filter Chain Basics](#filter-chain-basics)
-- [ffmpeg for Measurement](#ffmpeg-for-measurement)
+- [What Is LUFS?](#what-is-lufs)
+- [Start Here: Basic Command (1-Pass)](#start-here-basic-command-1-pass)
+- [Main loudnorm Parameters](#main-loudnorm-parameters)
+- [When to Use 1-Pass vs 2-Pass](#when-to-use-1-pass-vs-2-pass)
+- [Why loudnorm Can Make an Intro Sound Louder](#why-loudnorm-can-make-an-intro-sound-louder)
+- [Re-Encoding Is Required After Normalization](#re-encoding-is-required-after-normalization)
+- [Basic Settings That Help Preserve Tags and Artwork](#basic-settings-that-help-preserve-tags-and-artwork)
+- [How to Think About Filter Chains](#how-to-think-about-filter-chains)
 - [Practical Templates](#practical-templates)
 - [Summary](#summary)
 
-## Target Audience
-
-- You want to normalize volume with `ffmpeg`, but `loudnorm` arguments are still unclear
-- You want to preserve MP3 artwork and tags while normalizing
-- You want to understand the full workflow
-
 ## Prerequisites
 
-- You can use `ffmpeg` 6.x (installation reference: [this Qiita article](https://qiita.com/Tadataka_Takahashi/items/9dcb0cf308db6f5dc31b))
-- Main target is MP3, but the same approach mostly applies to AAC/WAV/FLAC
-- Commands are written so they are easy to read in both PowerShell and bash
+- `ffmpeg` 6.x is available (installation reference: [this Qiita article](https://qiita.com/Tadataka_Takahashi/items/9dcb0cf308db6f5dc31b))
+- The examples mainly target MP3, but the same ideas mostly apply to AAC, WAV, and FLAC
+- The commands are written in a style that is easy to read in both PowerShell and bash
 
-## What is LUFS?
+## What Is LUFS?
 
-`LUFS (Loudness Units relative to Full Scale)` is a unit of perceived loudness designed to align with human hearing.
-In digital audio, 0 is the maximum, so practical values are usually negative.
+`LUFS (Loudness Units relative to Full Scale)` is a unit for perceived loudness based on ITU-R BS.1770. Values are usually negative, and numbers closer to zero mean louder audio.
 
-<img src="/blog/ffmpeg-loudnorm-guide/lufs-reference-en.png" alt="LUFS reference chart: 0 LUFS as max, YouTube/Spotify around -14 LUFS, podcast around -16 LUFS, TV around -23 LUFS." style="width:100%; height:auto;">
+The reference for maximum digital sample amplitude is `0 dBFS`, not `0 LUFS`. LUFS is a separate metric for perceived loudness, which is why `TP` (True Peak) limits are discussed in relation to `0 dBFS`.
 
-## What is ffmpeg?
+Typical practical targets used in distribution workflows are as follows. These are not universal hard standards for every platform, but common working references.
 
-- Official site: <https://ffmpeg.org/>
-- GitHub: <https://github.com/FFmpeg/FFmpeg>
+| Platform | Practical LUFS Target |
+| --- | --- |
+| YouTube / Spotify | Around -14 LUFS |
+| Podcast | Around -16 LUFS |
+| TV Broadcast (EBU R 128) | -23 LUFS |
 
-ffmpeg is an open-source multimedia toolset for processing video and audio.
-From the command line, it can handle conversion, editing, and analysis.
+> Note: Spotify applies playback loudness normalization, and the reference level can vary depending on the playback mode. YouTube also does not publish a simple official rule saying "always master to -14 LUFS." Check the latest platform documentation when exact delivery requirements matter.
 
-If you want to use it from Python, you can install ffmpeg and use wrappers such as `ffmpeg-python`.
+{{< figure src="lufs-reference-en.png" alt="LUFS reference chart showing practical targets: YouTube and Spotify around -14 LUFS, podcast around -16 LUFS, and TV broadcast around -23 LUFS." >}}
 
-This article focuses on **loudness normalization for audio files (mainly MP3)**.
+## Start Here: Basic Command (1-Pass)
 
-For daily use, start with this baseline command (1-pass):
+Before going deeper, here is the quickest practical example:
 
 ```bash
 ffmpeg -i input.mp3 \
@@ -78,95 +71,49 @@ ffmpeg -i input.mp3 \
   output.mp3
 ```
 
-### Argument Breakdown
+Here is what each option does:
 
-`-i input.mp3`  
-Input file.
+| Option | Meaning |
+| --- | --- |
+| `-i input.mp3` | Input file |
+| `-map 0` | Includes all input streams such as audio and artwork |
+| `-map_metadata 0` | Copies metadata such as ID3 tags |
+| `-c:v copy` | Copies album artwork without re-encoding it |
+| `-af "loudnorm=..."` | Applies the loudness normalization filter |
+| `-c:a libmp3lame` | Re-encodes audio as MP3 |
+| `-q:a 2` | High-quality VBR setting |
 
-`-map 0`  
-Copies all streams in the input (audio, artwork, etc.) to output.  
-Without it, artwork may be dropped.
+If you need tighter alignment to the target loudness, use `2-pass`, covered below.
 
-Audio only (default-style explicit mapping):  
-`-map 0:a`
+## Main loudnorm Parameters
 
-`-map_metadata 0`  
-Copies metadata (ID3 tags, etc.) from input 0.  
-Useful for keeping title, artist, and album info.
-
-When there are two inputs:  
-`-map_metadata 1` copies metadata from input 1.
-
-Drop metadata entirely:  
-`-map_metadata -1`
-
-`-c:v copy`  
-MP3 album artwork is often handled as a video stream (`attached_pic`).  
-This copies it without re-encoding.
-
-`-af "loudnorm=I=-14:TP=-1.5:LRA=11"`  
-Specifies audio filters. Here, `loudnorm` is used for loudness normalization.
-
-`-c:a libmp3lame`  
-Audio codec for MP3 encoding.
-
-`-q:a 2`  
-VBR quality level for MP3.  
-`2` is high quality (roughly around ~190 kbps average).
-
-`output.mp3`  
-Output file name.
-
-For more accurate targeting, use `2-pass`, explained below.
-
-## Key loudnorm Parameters
-
-These are the first parameters to learn:
+The main parameter groups to understand are these:
 
 | Parameter | Meaning |
 | --- | --- |
 | `I` | Target LUFS (Integrated Loudness) |
 | `TP` | True Peak ceiling |
 | `LRA` | Target Loudness Range |
-| `linear` | Whether to apply linear correction |
-| `measured_*` | First-pass measurements for `2-pass` |
+| `linear` | Whether to use linear correction |
+| `measured_*` | First-pass measurements passed into `2-pass` |
 
 ### `I` (Target LUFS)
 
-This is the core setting: the loudness target you want at the end.
-
-Common targets:
+This is the main target that decides where the final loudness should land.
 
 - `I=-14`: YouTube, Spotify
 - `I=-16`: Podcast
-- `I=-23`: TV broadcast
+- `I=-23`: TV and broadcast-style delivery
 
 ### `TP` (True Peak Ceiling)
 
-Defines how high peaks are allowed to go, including inter-sample peaks.
+This sets the effective peak ceiling including inter-sample peaks. Even when the waveform does not visually clip, playback or conversion can still create peaks above `0 dBFS`, so leaving some headroom is standard practice.
 
-Even if the waveform does not clip visually, playback or conversion can still create effective peaks over 0 dBFS.  
-So it is common to leave headroom with `TP`.
+If you are unsure, starting around `-1.5 dBTP` is a safe default.
 
-Typical values:
+### `LRA` (Loudness Range)
 
-- `TP=-1.0`
-- `TP=-1.5`
-- `TP=-2.0`
-
-If unsure, start around `-1.5 dBTP`.
-
-### `LRA`
-
-`LRA` means `Loudness Range`, the width of loudness variation within a track.
-
-Higher values mean bigger difference between quiet and loud sections.
-Classical or movie audio often has higher LRA; pop music is usually lower.
-
-`loudnorm` uses `LRA` as a guide for how much variation to preserve.
-In practice, focus on `I` and `TP` first, then adjust `LRA` if needed.
-
-`LRA=11` is a solid default.
+`LRA` represents the amount of loudness variation across a track. Higher values mean bigger differences between quiet and loud sections, which is more common in classical music or film audio.
 
 | Genre / Use | Typical LRA |
 | --- | --- |
@@ -175,39 +122,31 @@ In practice, focus on `I` and `TP` first, then adjust `LRA` if needed.
 | General music | 6-12 |
 | Classical / Film audio | 12-20 |
 
+In practice, it is usually best to decide `I` and `TP` first, and only adjust `LRA` when the material or delivery purpose clearly calls for it. If you are unsure, `LRA=11` is a reasonable default.
+
 ### `linear`
 
-`linear=true` means: if possible, apply linear gain correction.
-In that mode, the whole track is raised/lowered by almost the same factor.
+`linear=true` tells `loudnorm` to use linear gain correction when possible. In that mode, the whole track is shifted up or down more uniformly, while keeping the original dynamics relationship largely intact.
 
-| Processing | Result |
-| --- | --- |
-| +3 dB | Entire track gets louder equally |
-| -3 dB | Entire track gets quieter equally |
-
-So the relative dynamics stay similar.
-
-This is often used when passing measured values in `2-pass`.
-In `1-pass`, linear correction may not fully achieve the target.
+This is commonly used in `2-pass` processing. In `1-pass`, linear correction is not always fully achievable.
 
 ### `measured_*`
 
-These parameters pass first-pass measurements to second pass:
+These parameters pass the first-pass measurements into the second pass.
 
-- `measured_I` <- `input_i`
-- `measured_TP` <- `input_tp`
-- `measured_LRA` <- `input_lra`
-- `measured_thresh` <- `input_thresh`
-- `offset` <- `target_offset`
+| `measured_*` | First-pass JSON field |
+| --- | --- |
+| `measured_I` | `input_i` |
+| `measured_TP` | `input_tp` |
+| `measured_LRA` | `input_lra` |
+| `measured_thresh` | `input_thresh` |
+| `offset` | `target_offset` |
 
-In short, `2-pass loudnorm` works like this:
-"Analyze first, then reuse those exact measurements for correction."
-
-## 1-Pass vs 2-Pass
+## When to Use 1-Pass vs 2-Pass
 
 ### 1-Pass
 
-Analyze and normalize in one ffmpeg run:
+This analyzes and normalizes in a single ffmpeg run. It is simple and fast, which makes it good for quick trials and batch processing.
 
 ```bash
 ffmpeg -i input.mp3 \
@@ -216,14 +155,13 @@ ffmpeg -i input.mp3 \
   output.mp3
 ```
 
-Pros: simple and fast. Good for quick trials and batch work.  
-Cons: less stable than `2-pass` when you need strict target accuracy.
+The tradeoff is that it tends to be less precise than `2-pass` when you care about strict target matching.
 
 ### 2-Pass
 
-Run analysis first, then normalize using measured values.
+This measures the file in the first pass, then uses the measured values in the second pass. It is more stable when you need the output to land closer to the intended target.
 
-First pass (discard output, get JSON):
+**Pass 1: measure only**
 
 ```bash
 ffmpeg -i input.mp3 \
@@ -231,7 +169,7 @@ ffmpeg -i input.mp3 \
   -f null -
 ```
 
-Extract:
+This does not produce an output file. Instead, it returns JSON containing:
 
 - `input_i`
 - `input_tp`
@@ -239,7 +177,7 @@ Extract:
 - `input_thresh`
 - `target_offset`
 
-Second pass:
+**Pass 2: use the measured values**
 
 ```bash
 ffmpeg -i input.mp3 \
@@ -249,99 +187,64 @@ ffmpeg -i input.mp3 \
   output.mp3
 ```
 
-Pros: more stable and accurate against target loudness.
-If you are building a tool, separate analysis and conversion phases.
+If you are building a tool around ffmpeg, it is usually easier to separate the measurement phase from the production conversion phase.
 
-## Why Introductions Can Sound Louder After loudnorm
+## Why loudnorm Can Make an Intro Sound Louder
 
-`loudnorm` decides gain by looking at the whole track's integrated loudness.
-It does not optimize only the intro separately.
+`loudnorm` decides the gain adjustment from the **integrated loudness of the whole track**. It does not treat a quiet intro as a separate section.
 
-So intros may become louder than expected when:
+That means intros may end up sounding louder than expected in tracks like these:
 
-- Intro is very quiet, then chorus gets much louder
-- Verse-to-chorus loudness gap is large
-- Source has wide dynamics
+- Songs with an extremely quiet intro and a much louder later section
+- Material with naturally wide dynamics
 
-With `linear=true`, gain tends to be applied more uniformly, so quiet intros can be lifted together with the loud sections.
+This is especially noticeable with `linear=true`, because the whole track is shifted more uniformly. `TP` only limits peak ceiling; it does not prevent the perceived loudness of a quiet intro from increasing.
 
-`TP` controls peak ceiling, not perceived intro loudness.
-`LRA` is a dynamics target, not a "protect quiet intro only" control.
-
-Main reasons:
-
-- Correction is based on whole-track loudness
-- Large dynamic-gap material lifts quiet parts more easily
-
-Possible mitigations:
+Useful mitigations include:
 
 - Prefer `2-pass` over `1-pass`
-- Lower target LUFS slightly
-- Depending on source, combine with pre-editing or other dynamics processing
+- Lower the target LUFS slightly
+- Combine normalization with pre-editing or other dynamics processing when the source needs it
 
-## Re-Encoding Is Required
+## Re-Encoding Is Required After Normalization
 
-When using audio filters like `loudnorm`, audio must be decoded, processed, and encoded again.
-So stream-copy for audio alone is not enough.
-
-Key options:
-
-| Item | Why it matters |
-| --- | --- |
-| Re-encoding | Required with filters |
-| VBR / CBR | Quality-size tradeoff |
-| Bitrate | Too low can degrade quality |
-
-Typical:
+When you use an audio filter like `loudnorm`, ffmpeg has to decode the audio, process it, and encode it again. That means audio stream copy (`-c:a copy`) is not an option.
 
 ```bash
 -c:a libmp3lame -q:a 2
 ```
 
-Guideline:
+Common choices:
 
-- `-c:a libmp3lame`: re-encode to MP3
-- `-q:a 2`: VBR quality setting (lower number = higher quality)
-- `-b:a 192k`: explicit bitrate for CBR/ABR-like control
+| Option | Meaning |
+| --- | --- |
+| `-c:a libmp3lame` | Re-encode as MP3 |
+| `-q:a 2` | VBR quality setting; lower numbers mean higher quality |
+| `-b:a 192k` | Use when you want an explicit bitrate for CBR or ABR-style output |
 
-For practical quality-size balance, start with `-q:a 2` or `-q:a 3`.
+For a practical balance of quality and file size, `-q:a 2` or `-q:a 3` is a good place to start.
 
-## Keep Tags and Artwork with Stream Mapping
+## Basic Settings That Help Preserve Tags and Artwork
 
-MP3 files can include:
-
-- audio
-- metadata
-- artwork
-
-Careless conversion often leads to:
-
-- audio is fine, but cover art is gone
-- some tags are missing
-
-Common safe mapping:
+MP3 files can contain more than audio: they may also include metadata (ID3 tags) and embedded cover art. If you leave out the mapping options, it is easy to end up with a file that still plays but has missing artwork or tags.
 
 ```bash
 -map 0 -map_metadata 0 -c:v copy
 ```
 
-### Meaning
+| Option | Meaning |
+| --- | --- |
+| `-map 0` | Includes all streams from the input |
+| `-map_metadata 0` | Copies metadata from the input |
+| `-c:v copy` | Copies the image stream without re-encoding |
 
-- `-map 0`: include all streams from input 0
-- `-map_metadata 0`: copy metadata from input 0
-- `-c:v copy`: copy image stream without re-encoding
+Embedded MP3 cover art is usually handled internally as an image stream. If your output only maps audio, that stream gets dropped.
 
-### Why Artwork Gets Lost
+That said, some custom ID3 frames or embedded lyrics may still fail to survive depending on the input structure. If metadata preservation matters, verify the output with a dedicated tag tool such as `id3v2` or `eyeD3`.
 
-Embedded cover art in MP3 is often treated as an image/video stream.
-If output maps only audio, that stream is dropped.
+## How to Think About Filter Chains
 
-Also, copying only ID3 metadata does not always guarantee embedded image retention.
-So verify both `-map 0` and `-c:v copy`.
-
-## Filter Chain Basics
-
-You can chain filters with `-af`:
+With `-af`, you can chain multiple filters in order by separating them with commas.
 
 ```bash
 ffmpeg -i input.mp3 \
@@ -358,39 +261,11 @@ Common filter roles:
 | `afftdn` | Noise reduction |
 | `agate` | Noise gate |
 
-For this article, keep `loudnorm` as the center.
-Noise reduction/gating can over-process some material, so normalize first, then add preprocessing only if needed.
-
-## ffmpeg for Measurement
-
-For tooling, it is critical to "measure first, parse JSON."
-
-Main points:
-
-- `-f null`
-- `print_format=json`
-
-Measurement command:
-
-```bash
-ffmpeg -hide_banner -i input.mp3 \
-  -af "loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json" \
-  -f null -
-```
-
-This lets you analyze without writing an output file.
-From CLI/GUI apps, parse this JSON and feed values into second-pass parameters.
-
-Implementation checklist:
-
-- First pass is measurement only (no output file)
-- Parse `input_i`, etc. from JSON
-- Pass `measured_*` and `offset` in second pass
-- Use `-map 0 -map_metadata 0 -c:v copy` in production conversion for metadata/artwork retention
+Noise reduction and gating can be too aggressive on some material. In most cases, it is safer to get `loudnorm` working well first, then add preprocessing only if needed.
 
 ## Practical Templates
 
-### Quick 1-Pass
+### Quick Start: 1-Pass
 
 ```bash
 ffmpeg -i input.mp3 \
@@ -400,17 +275,17 @@ ffmpeg -i input.mp3 \
   output.mp3
 ```
 
-### Accurate 2-Pass
+### More Accurate: 2-Pass
 
-Pass 1:
+**Pass 1**
 
 ```bash
-ffmpeg -i input.mp3 \
+ffmpeg -hide_banner -i input.mp3 \
   -af "loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json" \
   -f null -
 ```
 
-Pass 2:
+**Pass 2**
 
 ```bash
 ffmpeg -i input.mp3 \
@@ -420,17 +295,21 @@ ffmpeg -i input.mp3 \
   output.mp3
 ```
 
+Replace `...` with the values returned from the first pass JSON.
+
 ## Summary
 
-- Core `loudnorm` parameters: `I`, `TP`, `LRA`, `linear`, `measured_*`
-- Use `1-pass` for speed, `2-pass` for precision
-- Audio re-encoding is required when filters are used
-- To preserve MP3 tags/artwork, use `-map 0 -map_metadata 0 -c:v copy`
-- For tool development, measurement phase with `print_format=json` and `-f null -` is essential
+| Point | Summary |
+| --- | --- |
+| Choosing targets | Start by deciding `I`, then use `TP=-1.5` and `LRA=11` as practical defaults |
+| `1-pass` vs `2-pass` | Use `1-pass` for speed, `2-pass` for better accuracy |
+| Re-encoding | With filters, `-c:a libmp3lame -q:a 2` or similar encoding settings are required |
+| Tag and artwork preservation | Use `-map 0 -map_metadata 0 -c:v copy` as the basic preservation setup |
+| Tool design | Separate measurement (`-f null -`) and production conversion into two phases |
 
-If you want Python-based automation with GUI/CLI, check [Python MP3 Volume Normalizer: LUFS Auto-Normalization with ffmpeg](/en/blog/mp3-normalizer-devlog/).
+If you want to automate this from Python or wrap it in a GUI/CLI workflow, see [Python MP3 Volume Normalizer with ffmpeg: How It Works and How to Use It](/en/blog/mp3-normalizer-devlog/).
 
 ## Related Posts
 
-- [Python MP3 Volume Normalizer with ffmpeg: LUFS Auto Normalization Guide](/en/blog/mp3-normalizer-devlog/)
+- [Python MP3 Volume Normalizer with ffmpeg: How It Works and How to Use It](/en/blog/mp3-normalizer-devlog/)
 - [Ryzen 5 7600 and RTX 4070 Super PC Build: Parts, Price, and Why I Chose Them](/en/blog/dev-pc-build-ryzen7600-rtx4070s/)

@@ -1,108 +1,129 @@
 +++
-title = "Ryzen 5 7600 and RTX 4070 Super PC Build: Parts, Price, and Why I Chose Them"
+title = "Ryzen 5 7600 and RTX 4070 Super PC Build: A 162,915 Yen Setup for Development and Local AI"
 slug = "dev-pc-build-ryzen7600-rtx4070s"
 date = 2026-03-05T00:00:00+09:00
 draft = false
-description = "A practical PC build using Ryzen 5 7600 and RTX 4070 Super for development, local AI experiments, and light gaming, with full parts list, total cost, and build rationale."
+description = "A custom PC build using Ryzen 5 7600 and RTX 4070 Super, with a full parts list and purchase prices. This practical 162,915 yen setup is aimed at development work, local AI workloads, and light gaming."
 image = "購入パーツ一式.jpg"
 tags = ["pc-build", "Ryzen 5 7600", "RTX 4070 Super", "Ubuntu", "dev-environment"]
 categories = ["dev-environment"]
 +++
 
-This is a slightly older build that I bought during the Black Friday sale in November 2024.  
-It is no longer the newest setup, but I am still very satisfied with it as a machine that balances software development and local AI experiments, so I wanted to document it.
+This is the configuration I bought during the Black Friday sale in November 2024.  
+It is no longer the latest build, but I am still very happy with it as a machine that balances software development and local AI work, so I wanted to document it here as a practical example.
+
+## Table of Contents
+
+- [Main Use Cases](#main-use-cases)
+- [Why I Replaced My Previous PC](#why-i-replaced-my-previous-pc)
+- [Parts List and Purchase Prices](#parts-list-and-purchase-prices)
+- [Why I Chose Each Part](#why-i-chose-each-part)
+- [Why I Switched to microATX to Save Space](#why-i-switched-to-microatx-to-save-space)
+- [Where I Deliberately Cut Costs](#where-i-deliberately-cut-costs)
+- [Build-Time Notes](#build-time-notes)
+- [Summary](#summary)
+
+---
 
 ## Main Use Cases
 
-- Everyday work
-- Local AI experiments
-- Games that are not too demanding
+- Everyday development work such as editors, builds, Docker, and databases
+- Local LLM and AI workloads
+- Games that are not especially demanding
 
 ## Why I Replaced My Previous PC
 
-My previous GPU was a `GTX 760`, which was not really usable for CUDA, so AI-related development was difficult.  
-I replaced the whole setup to get a machine where I could actually try AI workloads locally.
+My previous GPU was a `GTX 760` from the Kepler generation, with CUDA Compute Capability 3.0.  
+Recent versions of PyTorch and TensorFlow often require CUDA capability 3.5 or higher, and in many cases 5.0 or higher, which meant I could no longer satisfy library requirements and local AI experimentation had effectively become impractical.
 
-## Parts List
+I replaced the whole system so I could realistically run local inference and fine-tuning workloads again.
 
-![Purchased parts](購入パーツ一式.jpg)
+## Parts List and Purchase Prices
 
-| Part | Model | Price | Store |
+{{< figure src="購入パーツ一式.jpg" alt="Purchased PC parts" >}}
+
+| Part | Model / Spec | Price | Store |
 | --- | --- | ---: | --- |
 | CPU + motherboard + RAM bundle | Ryzen 5 7600 / B650M Pro RS / DDR5 32GB | ¥49,800 | Sofmap |
-| GPU | RTX 4070 Super | ¥93,500 | Dospara |
-| SSD | M.2 500GB | ¥5,590 | Tsukumo |
-| Case | CX200 RGB elite | ¥6,380 | PC Koubou |
-| PSU | 650W bronze | ¥7,645 | Joshin |
+| GPU | RTX 4070 Super (12GB VRAM) | ¥93,500 | Dospara |
+| SSD | M.2 NVMe 500GB | ¥5,590 | Tsukumo |
+| Case | Antec CX200 RGB Elite | ¥6,380 | PC Koubou |
+| PSU | 650W 80PLUS Bronze | ¥7,645 | Joshin |
 
 **Total: ¥162,915 (tax included)**
 
-All parts were bought online.
+All parts were purchased online. Ubuntu was used as the OS, so there was no OS license cost.  
+Existing HDDs and secondary SSDs were reused and are not included in the total above.
 
-## Why I Chose This Configuration
+## Why I Chose Each Part
 
 ### Ryzen 5 7600
 
-It has excellent cost-performance and strong single-core performance.  
-I picked it because I care a lot about day-to-day responsiveness during development, such as editor usage, builds, and general desktop work.
+It sits in the entry class of the AM5 platform, but single-threaded performance is strong, and I judged it to be more than enough for day-to-day responsiveness during development work such as editor use, builds, and general desktop tasks.  
 
-### RTX 4070 Super
+For workloads where multi-thread performance dominates, such as video encoding or very large compiles, a higher-end CPU could certainly make sense. But for the main purpose of this build, I considered that unnecessary spending and redirected the budget elsewhere.
 
-For AI workloads, I prioritized GPU capability and VRAM.  
-When you want to experiment locally, both raw GPU performance and VRAM capacity matter, so this was the main place where I concentrated the budget.
+### RTX 4070 Super (12GB VRAM)
 
-### 32GB RAM
+For local AI experiments, VRAM directly determines the size of model you can load realistically.  
+If you want to run roughly 7B to 13B class models in float16, something like 14GB to 26GB of VRAM would be ideal in broad terms. But with quantized formats such as GGUF or AWQ, 12GB is still practical for 7B to 13B class experimentation.
 
-For development work, 16GB becomes limiting pretty quickly.  
-I chose 32GB because I expected to run Docker, an IDE, a browser, and databases at the same time.  
-The price was also fairly reasonable at the time.
+Within this budget, maximizing usable VRAM was the main reason I went with this GPU.
+
+### 32GB DDR5 Memory
+
+In a development environment where Docker, an IDE, browsers, and databases are open at the same time, 16GB becomes restrictive fairly quickly depending on the workflow.  
+I chose 32GB mainly to secure comfortable practical headroom, and the price at the time also made the choice easier.
+
+That said, required capacity depends heavily on your own workload and Docker image footprint, so this should be treated as a reference point rather than a universal rule.
 
 ### Ubuntu
 
-The OS is Ubuntu, so there was no licensing cost.  
-That let me put more of the budget into actual performance parts such as the GPU and memory.
+Using Ubuntu reduced OS cost to zero, which let me move more of the budget into the GPU and memory.  
+It also fits well with the AI and development tooling ecosystem, so for this machine's intended use I considered it the more rational choice.
 
-## Case Size and Why I Went With microATX
+## Why I Switched to microATX to Save Space
 
-My previous PC used a full ATX case, and it had become annoyingly large.  
-This time I switched to microATX to save space.
+My previous PC used a full-size ATX tower and took up too much space.  
+This time I switched to a microATX build specifically to reduce the footprint.
 
-The case, `CX200 RGB elite`, matched its early reputation in that it has a few quirks and is not especially easy to build in.  
-Internal space is fairly tight, so cable routing can feel cramped.  
-That said, once the build is finished it looks good, and overall I am happy with it.
+The case, `Antec CX200 RGB Elite`, matches its review reputation in that it is not the easiest case to build in, and the limited internal space makes cable routing somewhat cramped.  
+Still, I like how it looks once everything is assembled, so overall I think it was a good tradeoff.
 
-## One Note About Adding Wi-Fi Later
+## Where I Deliberately Cut Costs
 
-If you plan to add an M.2 Wi-Fi module later, be aware that the antenna cable run from the motherboard to the rear slot area is quite tight.  
-Because space inside the case is limited, it is worth checking cable routing in advance.
+**Power supply: chose a non-modular unit**  
+A 650W 80PLUS Bronze PSU is sufficient for an RTX 4070 Super (220W TDP) plus Ryzen 5 7600 (65W) configuration.  
+Fully modular PSUs do make cable handling easier, but I decided the price difference was better spent on other parts and went with a non-modular model.
 
-## PSU and Cosmetic Trade-Offs
+**Prioritized price-to-performance over appearance**  
+Because the case is white, I originally wanted a white GPU too. But paying tens of thousands of yen extra just for the external color did not make sense, so I dropped that idea.
 
-My PSU policy here was simple: if it works reliably, that is enough.  
-I prioritized cost and skipped a more expensive modular power supply.
+**Reused existing storage**  
+The HDDs and secondary SSDs were carried over from the previous system. The only new storage purchase was the 500GB M.2 NVMe drive for the OS, which helped keep the total cost down.
 
-Since the case is white, I originally wanted a white GPU as well.  
-But paying tens of thousands of yen more just for the color did not make sense to me, so I gave that up.  
-I prioritized performance per yen over appearance.
+## Build-Time Notes
 
-## Storage Strategy
+### If You Plan to Add an M.2 Wi-Fi Card Later
 
-I reused my existing HDDs and SSDs.  
-The only new storage purchase was the M.2 drive for the OS.  
-That kept the total cost down while still giving me enough speed where it mattered.
+In this case, if you add an M.2 Wi-Fi adapter later, the antenna cable path from the motherboard to the rear slot area becomes fairly long and tight.  
+If you expect to add one later, it is worth checking the antenna routing before the full build is finished.
 
 ## Summary
 
-This build was based on a simple rule: spend money only where it actually matters.
+This build followed a simple rule: spend money only where it actually matters.
 
-- CPU: value for money
-- GPU: prioritized for AI workloads
-- RAM: enough for practical development work
-- Savings from Ubuntu and reused storage
+- **GPU**: prioritized VRAM and put more than half of the total budget there
+- **CPU**: kept day-to-day development responsiveness high while controlling cost
+- **Memory**: secured 32GB for realistic Docker plus IDE multitasking
+- **OS and storage**: saved money through a free OS and reused drives
 
-As a result, it turned into a very satisfying roughly 170,000 yen class machine that can handle both development work and local AI experiments in a realistic way.
+At a total of 162,915 yen, this turned into a practical machine for both development work and local AI workloads.  
+The prices reflect what I paid at the time, so they will differ from current market prices, but I hope the configuration itself is still useful as a reference.
+
+---
 
 ## Related Posts
 
 - [Why I Built an Ansys Version Selector Tool | Reducing the Risk of Opening Old Simulation Files in the Wrong Version](/en/blog/ansys-version-selector/)
-- [Python MP3 Volume Normalizer with ffmpeg: LUFS Auto Normalization Guide](/en/blog/mp3-normalizer-devlog/)
+- [Python MP3 Volume Normalizer with ffmpeg: How It Works and How to Use It](/en/blog/mp3-normalizer-devlog/)

@@ -11,24 +11,25 @@ GitHub: [mitz17/get-chrome-driver](https://github.com/mitz17/get-chrome-driver)
 
 ## Why I Built It
 
-When you run Selenium-based scraping or browser automation, Chrome can auto-update and suddenly create a version mismatch with ChromeDriver. One day my tests started failing out of nowhere, and the logs were full of messages like this:
+When you run Selenium-based scraping or browser automation, Chrome can auto-update and suddenly create a version mismatch with ChromeDriver. I ran into this more than once, with tests failing on errors like this:
 
-```
+```text
 SessionNotCreatedException
 This version of ChromeDriver only supports Chrome version XX
 Current browser version is YY
 ```
 
-To control Chrome through Selenium, you need a ChromeDriver version that matches the installed Chrome version. The problem is that Chrome updates automatically, so manually finding the right ZIP file, extracting it, and distributing it to test machines quickly becomes a bottleneck.
+To control Chrome through Selenium, you need a ChromeDriver version that matches the installed Chrome version. The problem is that Chrome updates automatically, so manually finding the right ZIP file, extracting it, and distributing it to each environment quickly becomes tedious.
 
-On top of that, since 2023 the official distribution flow has been consolidated into the **Chrome for Testing (CfT) API**, which means older download URLs do not always provide the latest compatible version anymore. What I needed in practice was a tool that automates the following three steps. (Disabling Chrome auto-update is another possible workaround, but I did not want to rely on that for security reasons, so I wrote the program below.)
+Since 2023, ChromeDriver distribution has also been consolidated into the **Chrome for Testing (CfT) API**, so older fixed-download approaches are no longer reliable for getting the latest compatible driver. That is why I built `get-chrome-driver` to automate the following flow.
 
 ## Automatically Resolve ChromeDriver Version Mismatches Before Running Selenium
 
-1. Detect the installed Chrome version before Selenium starts
-2. Download the matching ChromeDriver from the CfT API and save it to a verified location (`C:\Users\<username>\.get-chrome-driver`)
+1. Detect the installed Chrome version in the current environment
+2. Download and save the matching ChromeDriver from the CfT API
+3. Optionally verify that Selenium can actually launch it
 
-I built `get-chrome-driver` to make this flow possible with a single command, and this article explains how it works.
+This article explains how that flow works and how to use the tool.
 
 ## Processing Flow
 
@@ -71,9 +72,9 @@ def get_chrome_version():
                 continue
 ```
 
-On Windows, the tool first checks the registry (`BLBeacon`, `Uninstall`). If that does not work, the later part of the same function reads `chrome.exe`'s `ProductVersion` via PowerShell. On macOS it parses the output of `--version`, and on Linux it retries several commands such as `google-chrome` and `chromium-browser` until one succeeds.
+On Windows, the tool first checks the registry. If that does not work, a later part of the same function reads the `ProductVersion` from `chrome.exe`. On Linux, it retries multiple commands such as `google-chrome` and `chromium-browser`, and on macOS it parses the output of `--version`.
 
-### 2. Decide the Platform String
+### 2. Decide the Platform String for the CfT API
 
 ```python
 # get_chrome_driver/api.py
@@ -93,9 +94,9 @@ def get_platform_string():
     return None
 ```
 
-This converts the local environment into the platform names used by the CfT JSON. On Windows in particular, it chooses between `win64` and `win32` based on whether Python itself is 64-bit, so that the following API call can resolve to a single correct URL.
+This maps the local environment to the identifiers used in the CfT JSON, such as `linux64`, `mac-arm64`, `mac-x64`, `win64`, and `win32`. On Windows, the decision is based on whether Python itself is 64-bit.
 
-### 3. Look Up the Driver Archive Through the CfT API
+### 3. Look Up the Download URL Through the CfT API
 
 ```python
 # get_chrome_driver/api.py
@@ -108,7 +109,7 @@ def get_driver_download_url(chrome_version, platform_name):
         if url:
             return url
     except Exception as e:
-        print(f"CfT known-good 取得中にエラーが発生しました: {e}")
+        print(f"CfT known-good lookup failed: {e}")
 
     try:
         response = requests.get(LAST_KNOWN_GOOD_URL, timeout=30)
@@ -121,14 +122,14 @@ def get_driver_download_url(chrome_version, platform_name):
         if url:
             return url
     except Exception as e:
-        print(f"CfT last-known-good 取得中にエラーが発生しました: {e}")
+        print(f"CfT last-known-good lookup failed: {e}")
 
     return None
 ```
 
-The tool first checks `known-good`. If it cannot find a match there, it tries `last-known-good`, searching `versions` and then `channels` in order to resolve a link from Stable, Beta, Dev, or Canary. It only requires a matching major version, which makes it tolerant of minor build differences while still staying in the same compatibility line.
+The tool checks `known-good-versions-with-downloads.json` first. If it cannot find a match there, it falls back to `last-known-good-versions-with-downloads.json` and searches both `versions` and `channels`. It matches on the major version, which is usually enough to stay within the correct compatibility line even if the full build number differs.
 
-### 4. Compare With an Existing Driver
+### 4. Reuse an Existing Driver When Possible
 
 ```python
 # get_chrome_driver/core.py
@@ -137,15 +138,15 @@ target_major = version.split('.')[0]
 if existing_version:
     existing_major = existing_version.split('.')[0]
     if existing_major == target_major and self.driver_path.exists():
-        print(f"既存の ChromeDriver (バージョン {existing_version}) は互換性があります。")
+        print(f"Existing ChromeDriver version {existing_version} is compatible.")
         return str(self.driver_path)
     else:
-        print(f"ChromeDriver を更新します: 現在 {existing_version} -> 目標メジャー {target_major}")
+        print(f"Updating ChromeDriver: {existing_version} -> major {target_major}")
 ```
 
-The installer compares the major version of the saved driver with the Chrome version. If the major versions match, it skips the download. It only enters the download flow when compatibility has actually broken.
+If a previously downloaded ChromeDriver already exists and its major version matches the installed Chrome version, the tool skips the download. It only updates the driver when compatibility is actually broken.
 
-### 5. Download and Extract the Archive Safely
+### 5. Download and Extract the ZIP Safely
 
 ```python
 # get_chrome_driver/core.py
@@ -165,9 +166,9 @@ if os.name != "nt":
     self.driver_path.chmod(0o755)
 ```
 
-If a ZIP entry contains `..` or an absolute path, it is ignored. Only the actual `chromedriver` or `chromedriver.exe` binary is extracted. After extraction, executable permissions are set on macOS and Linux. On Windows, the tool keeps the latest driver under `~/.get-chrome-driver/`, which resolves to the user's home directory.
+If a ZIP entry contains `..` or an absolute path, it is ignored. Only the actual `chromedriver` or `chromedriver.exe` binary is extracted. On macOS and Linux, executable permissions are added after extraction.
 
-### 6. Verify That Selenium Actually Works
+### 6. Verify That Selenium Can Launch It
 
 ```python
 # get_chrome_driver/core.py
@@ -182,19 +183,20 @@ title = driver.title
 driver.quit()
 ```
 
-`GetChromeDriver.validate()` runs this check and returns `True` if it can launch Chrome and reach Google successfully. If you use the `--no-validate` flag in `main.py`, this Selenium check is skipped, which is useful in restricted CI environments or distribution targets with limited network access.
+`GetChromeDriver.validate()` runs this check and treats it as success if Chrome starts and reaches Google. In CI or restricted network environments, you can skip this step with `main.py --no-validate`.
 
 ## How to Use It
 
 ### Requirements
 
 - Python 3.8 or later
-- An environment where Chrome and the network are accessible
+- Chrome installed on the machine
+- Network access
 
 ### Setup
 
 ```powershell
-# Clone the repository
+# Clone the repository and create a virtual environment
 cd C:\workspace\projects
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -214,11 +216,11 @@ python main.py --check
 python main.py --no-validate
 ```
 
-The tool saves `chromedriver.exe` under `~/.get-chrome-driver/` (on Windows, `C:\Users\<username>\.get-chrome-driver`). You do not need to add it to `PATH`; you can just pass `driver_path` explicitly from Selenium.
+The tool saves ChromeDriver under `~/.get-chrome-driver/`. On Windows, that is typically `C:\Users\<username>\.get-chrome-driver\`. You do not need to add it to `PATH` if you pass `driver_path` explicitly from Selenium.
 
-### Import It Into a Selenium Script
+### Use It Directly in a Selenium Script
 
-Instead of using the CLI only as a one-off tool, a safer pattern is to import `GetChromeDriver` directly in your Selenium tests so the driver is always aligned before execution.
+Instead of using the CLI as a one-off command, you can call `GetChromeDriver` directly from your test code so that the driver is aligned before each run.
 
 ```python
 from get_chrome_driver.core import GetChromeDriver
@@ -229,16 +231,11 @@ installer = GetChromeDriver()
 driver_path = installer.install()
 service = Service(executable_path=driver_path)
 driver = webdriver.Chrome(service=service)
-# Continue with Selenium operations
+# Continue with Selenium logic here
 ```
 
-If you call this before each test run, you can reliably fetch a matching ChromeDriver even right after Chrome auto-updates. The downloaded result is also cached under `~/.get-chrome-driver/`.
+If Chrome auto-updates right before a test run, this flow still fetches the matching ChromeDriver first. The result is cached under `~/.get-chrome-driver/`, so it does not need to be downloaded every time.
 
 ## Final Notes
 
-The ChromeDriver distribution rules may change again in the future, so the code is structured so that only the parsing logic in `api.py` should need to change if the CfT API response format changes. Once version detection, download, and validation are automated, the time previously spent on Selenium setup can be used for actual test work instead.
-
-## Related Posts
-
-- [Why I Built an Ansys Version Selector Tool | Reducing the Risk of Opening Old Simulation Files in the Wrong Version](/en/blog/ansys-version-selector/)
-- [Python MP3 Volume Normalizer with ffmpeg: LUFS Auto Normalization Guide](/en/blog/mp3-normalizer-devlog/)
+Using `get-chrome-driver`, you can resolve ChromeDriver version mismatches automatically before Selenium runs. Even if the CfT API changes again in the future, the structure keeps most of that impact isolated to the retrieval logic in `api.py`. It is a small utility, but it removes a recurring setup problem from Selenium workflows.

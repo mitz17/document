@@ -1,9 +1,10 @@
 +++
-title = 'Python MP3 Volume Normalizer with ffmpeg: LUFS Auto Normalization Guide'
+title = 'Python MP3 Volume Normalizer with ffmpeg: How It Works and How to Use It'
 date = 2026-03-02T00:00:00+09:00
+lastmod = 2026-03-18T00:00:00+09:00
 draft = false
-description = 'Development notes for mp3-normalizer, a Python and ffmpeg tool for automatic MP3 loudness normalization with LUFS. Built for batch volume fixes without memorizing ffmpeg commands.'
-tags = ['python', 'ffmpeg', 'LUFS', 'MP3', 'audio-processing']
+description = 'Normalize inconsistent MP3 loudness in batches with ffmpeg loudnorm. This article explains setup, usage, and implementation details of the Python GUI/CLI tool mp3-normalizer.'
+tags = ['python', 'ffmpeg', 'LUFS', 'MP3', 'audio-processing', 'volume-normalization']
 categories = ['project']
 slug = 'mp3-normalizer-devlog'
 aliases = ['/en/blog/mp3-lufs-normalizer-python/']
@@ -11,76 +12,108 @@ aliases = ['/en/blog/mp3-lufs-normalizer-python/']
 
 GitHub: [mitz17/mp3-normalizer](https://github.com/mitz17/mp3-normalizer)
 
-## Background
+## Are Your MP3 Files All Different Volumes?
 
-I played some MP3 files I made about 10 years ago and thought, "Wait, why is this so quiet?"
-At first I suspected bitrate damage from endless copy-and-paste workflows, but audio quality itself was still fine.
-The real issue was inconsistent loudness. That experience led me to build this tool.
+Have you ever played an old MP3 file and thought, "Why is this so quiet?" The file itself is not broken, but each track has a different loudness, so you end up adjusting the volume manually every time. This tool solves that problem with **ffmpeg's `loudnorm` filter** and a **Python tool called `mp3-normalizer`**.
 
-## Target Audience
+Here is what the tool does:
 
-- People who still value old MP3 archives and only want to quickly fix volume
-- People who don't want to memorize `ffmpeg` commands but want batch normalization
+- Batch-normalizes MP3 files in a folder to **-14 LUFS** as a practical default target
+- Uses the same processing engine from both **GUI and CLI**
+- Re-encodes while preserving ID3 tags, lyrics, and artwork as much as possible
+- Tracks processed history in JSON to **avoid duplicate processing and accidental overwrite**
 
-## Prerequisites (Python and MP3)
+---
 
-- A working environment with Python 3.11+ and ffmpeg 6.x. For ffmpeg installation, see [this Qiita article](https://qiita.com/Tadataka_Takahashi/items/9dcb0cf308db6f5dc31b).
-- Prepare a folder of `.mp3` files to normalize. Convert WAV and other formats beforehand if needed.
+## What Is ffmpeg `loudnorm`?
 
-## What is ffmpeg?
+`loudnorm` is a loudness normalization filter built into ffmpeg. Instead of relying only on waveform peak values, it uses **LUFS (Loudness Units Full Scale)**, which is closer to perceived loudness. That makes it much better for fixing tracks that feel too loud or too quiet compared with each other.
 
-ffmpeg is a classic open-source toolkit for audio/video processing.
-It handles conversion, trimming, and normalization from the command line.
+If you want a deeper explanation of the parameters and the difference between 1-pass and 2-pass normalization, see [ffmpeg loudnorm Guide: LUFS Normalization, True Peak, and 2-Pass Settings](/en/blog/ffmpeg-loudnorm-guide/).
 
-`mp3-normalizer` calls ffmpeg's `loudnorm` filter to adjust LUFS.
-Even when controlled from a GUI, ffmpeg commands run underneath, so you can flexibly change True Peak ceilings and target LUFS values by adjusting parameters.
+---
 
-If you want the ffmpeg side first (`loudnorm` parameters, `1-pass / 2-pass`, True Peak, LRA), see [ffmpeg loudnorm Guide: LUFS Normalization, True Peak, and 2-Pass Settings](/en/blog/ffmpeg-loudnorm-guide/).
+## Intended Readers and Requirements
 
-## Environment
+- People who want to keep old MP3 archives but only need to **fix loudness quickly**
+- People who do not want to memorize `ffmpeg` commands but still want batch processing
+- Python users who also want to understand the implementation details
 
-- OS: verified on Windows 11 (PowerShell)
-- Python: 3.11.7 (`python -m venv .venv` recommended)
-- ffmpeg: 6.1 series (`ffmpeg -version`)
-- GUI: plain Tkinter + ttk
+You need **Python 3.11 or later** and **ffmpeg 6.x**. For ffmpeg installation, see [this Qiita article](https://qiita.com/Tadataka_Takahashi/items/9dcb0cf308db6f5dc31b). Put the `.mp3` files you want to normalize into one folder first. If you want to process WAV or other formats, convert them in advance or use the extension/output-format options described later.
 
-## Goal
+---
 
-- Make the LUFS normalization workflow reproducible across operating systems
-- Keep GUI and CLI outputs aligned with clear history/logs
-- Make "replace input folder and normalize" practical in daily workflow
+## Setup
 
-## Project Overview
+```bash
+# 1. Clone the repository
+git clone https://github.com/mitz17/mp3-normalizer
 
-- Lightweight stack: Python 3.11 + ffmpeg 6.x
-- Shared engine for GUI/CLI (`processor.py`) and reusable utilities (`utils.py`)
-- `processed_history.json` prevents duplicate processing; `mp3_normalizer.log` stores evidence
-- Uses `loudnorm` 1-pass with default targets `-14 LUFS` / `-1 dBFS`
+# 2. Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\Activate.ps1
 
-## Problems It Solves
+# 3. Install dependencies
+pip install -r requirements.txt
 
-- Old files may still sound good, so normalizing volume alone restores usability
-- GUI dropdowns let you run normalization without remembering ffmpeg commands
-- Logs record when and how files were processed, which reduces rollback anxiety
+# 4. Launch
+python main.py                   # GUI mode
+python main.py --cli ...         # CLI batch mode
+```
 
-## Setup Flow
+---
 
-1. Clone source: `git clone https://github.com/mitz17/mp3-normalizer`
-2. Create venv: `python -m venv .venv && source .venv/bin/activate` (Windows: `Activate.ps1`)
-3. Install deps: `pip install -r requirements.txt`
-4. Run GUI: `python main.py`; run batch via CLI: `python main.py --cli ...`
-5. Compare output MP3 files and verify values in logs
+## Usage: GUI
 
-## Architecture and Implementation Notes
+1. Set the **input and output directories**. The target MP3 list appears automatically.
+2. Enter the **target LUFS and True Peak**. If you are unsure, the defaults (`-14 LUFS / -1 dBFS`) are a safe starting point.
+3. Adjust behavior with toggles such as **recursive scan** and **force re-encode**.
+4. Click **Run** and watch the progress log update in real time, then review the results after completion.
 
-- `gui.py` builds UI with Tkinter `Frame`s and runs ffmpeg in a worker thread to avoid UI freeze
-- `processor.py` scans targets via `Path.rglob('*.mp3')`; collision files get suffixes like `_1`, `_2`
-- `-map_metadata 0` keeps ID3 tags during re-encoding
-- Logs are plain text with LUFS values and full commands
+<p><img src="/images/mp3-normalizer-gui.png" alt="mp3-normalizer GUI" loading="lazy" style="border-radius:16px; box-shadow:0 8px 24px rgba(15,23,42,0.18);"></p>
 
-## Quick Code Walkthrough
+> You can see input/output paths, target LUFS, target files, and logs on a single screen.
 
-`AudioProcessor.process_directory` in `processor.py` scans input, builds a plan, checks duplicates, and generates safe output names ([GitHub code](https://github.com/mitz17/mp3-normalizer/blob/main/processor.py#L180-L232)).
+---
+
+## Usage: CLI
+
+If you want batch processing without the GUI, use the CLI mode. It is easier to combine with scripts or task schedulers.
+
+```bash
+# Basic usage
+python main.py --cli --input ./music_in --output ./music_out
+
+# Change LUFS and True Peak
+python main.py --cli --input ./music_in --output ./music_out --lufs -16 --tp -1.5
+
+# Set worker count (default: CPU core count)
+python main.py --cli --input ./music_in --output ./music_out --workers 4
+
+# Change input extension and output format
+python main.py --cli --input ./music_in --output ./music_out --ext flac --format aac
+```
+
+The processing log is saved to `mp3_normalizer.log`, including the LUFS-related output for each ffmpeg command.
+
+---
+
+## Implementation Highlights
+
+### Architecture Overview
+
+```text
+main.py
+├── gui.py        ─ Tkinter + ttk. Runs ffmpeg in a worker thread to avoid UI freezes
+├── processor.py  ─ Shared engine for GUI / CLI. Handles file scanning, deduplication, and normalization
+└── utils.py      ─ General utilities such as path generation and log formatting
+```
+
+Processed files are tracked in `processed_history.json` using file size and modification time, and are skipped automatically on later runs. With the default setting (`force=False`), existing output files are not overwritten.
+
+### File Scanning and Duplicate Avoidance
+
+In `AudioProcessor.process_directory` inside `processor.py`, the tool scans the input directory, builds a processing plan, and adds suffixes such as `_1` and `_2` when output names would collide ([GitHub code](https://github.com/mitz17/mp3-normalizer/blob/main/processor.py#L180-L232)).
 
 ```python
 for index, entry in enumerate(plan.entries, start=1):
@@ -102,10 +135,9 @@ for index, entry in enumerate(plan.entries, start=1):
 self.history_service.save()
 ```
 
-`generate_unique_output_path` avoids overwrite by adding `_1`, `_2`, ...
-`HistoryService` stores size/mtime in `processed_history.json` and skips already-processed files.
+### Building the ffmpeg Command
 
-Actual ffmpeg execution happens in `FfmpegExecutor.normalize` ([code](https://github.com/mitz17/mp3-normalizer/blob/main/processor.py#L63-L111)):
+Actual ffmpeg execution happens in `FfmpegExecutor.normalize` ([code here](https://github.com/mitz17/mp3-normalizer/blob/main/processor.py#L63-L111)). The full command is written to the log so you can always see what the GUI is doing underneath.
 
 ```python
 command = [
@@ -121,56 +153,28 @@ self.logger.info("ffmpeg command: %s", command_str)
 completed = subprocess.run(command, check=False, capture_output=True, text=True)
 ```
 
-The process checks return codes for success/failure, and the same command string appears in GUI logs for transparency.
+`-map_metadata 0` preserves ID3 metadata during re-encoding, and additional post-processing with the `mutagen` library is used to copy lyric tags that ffmpeg alone may drop.
 
-## GUI Experience
+---
 
-1. Set input/output directories; target MP3 list appears immediately.
-2. Enter LUFS and True Peak (defaults `-14 / -1` are fine to start).
-3. Tune behavior via recursive and force-reencode toggles.
-4. Click run, watch progress logs, and inspect results in one screen.
+## Update History
 
-<p><img src="/images/mp3-normalizer-gui.png" alt="mp3-normalizer GUI mockup" loading="lazy" style="border-radius:16px; box-shadow:0 8px 24px rgba(15,23,42,0.18);"></p>
+| Date | Details |
+|------|------|
+| 2026-03-04 | Changed from serial processing to parallel processing. Processing 145 files improved from 670 seconds to 207 seconds, about 3.2x faster. Also hardened text encoding handling on Windows. |
+| 2026-03-05 | Added lyric tag copy support using `mutagen`, so lyrics can be preserved after normalization. |
+| 2026-03-08 | Reduced excessive loudness boost on quiet intros. Added bitrate detection to keep output at a comparable bitrate. Added selectable input extension and output formats (`mp3`, `aac`, `flac`, `wav`, `ogg`). Strengthened artwork retention with a two-step approach. |
+| 2026-03-18 | **Known issue**: about 1 in 100 files may lose only the artist tag. The reproduction pattern is still unclear even within the same album. I plan to open an Issue. [If you want to help investigate, start here](https://github.com/mitz17/mp3-normalizer). |
 
-> A rough GUI mock showing inputs/outputs, target LUFS, target files, and logs on one screen.
+---
 
 ## Summary
 
-- Even with a simple Tkinter x ffmpeg stack, the pain of loudness normalization can be reduced a lot.
-- If you want to keep using old MP3 files, try cloning and testing `mp3-normalizer`.
+- Even with a simple Tkinter plus ffmpeg setup, MP3 loudness normalization can be made very practical
+- The tool keeps GUI interaction and CLI batch automation aligned around the same processing quality
+- If you still have old MP3 files you want to keep using, `mp3-normalizer` is meant to make that cleanup easier
 
-## Update: March 4, 2026
-
-- Switched from serial processing to parallel processing for major speed gains.
-- In measurement, processing 145 MP3 files improved from 670s to 207.3s (about 3.23x faster, ~69.1% shorter) with 4 workers.
-- Worker limit now follows available CPU cores.
-- Hardened ffmpeg output encoding handling to reduce Windows mojibake-related failures.
-
-## Update: March 5, 2026
-
-- Issue:
-  - In some cases, embedded lyric tags were not preserved during ffmpeg normalization.
-- Fix:
-  - Added post-process lyric tag copy using `mutagen`.
-- Impact:
-  - Lyric tags can now be preserved after normalization.
-
-## Update: March 8, 2026
-
-- Addressed the issue where quiet intros could become too loud.
-- If input bitrate is detected, output now tries to keep a comparable bitrate to reduce unintended quality loss.
-- Added selectable input extensions, so non-MP3 sources are easier to process in batches.
-- Added selectable output formats: `mp3`, `aac`, `flac`, `wav`, `ogg`.
-- Removed duplicate `workers` definitions and unified parallelism control across GUI/CLI paths.
-- Strengthened artwork retention using both ffmpeg mapping adjustments and post-tag migration.
-
-## Update: March 18, 2026
-
-- Known issue: roughly 1 out of 100 files may lose only the artist tag after normalization.
-- Even within the same album, some files keep the tag correctly while others do not, and I still have not confirmed a reliable reproduction pattern.
-- I will at least open an Issue for it. I may not have time to investigate soon, so if someone wants to fix it, that would help a lot. Repository: [mitz17/mp3-normalizer](https://github.com/mitz17/mp3-normalizer)
-
-- For ffmpeg command-level details and 2-pass `loudnorm` parameter design, see [ffmpeg loudnorm Guide: LUFS Normalization, True Peak, and 2-Pass Settings](/en/blog/ffmpeg-loudnorm-guide/).
+---
 
 ## Related Posts
 
