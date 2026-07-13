@@ -3,7 +3,7 @@ title = 'ffmpeg loudnorm の使い方｜LUFS正規化と2pass設定をコマン�
 date = 2026-03-08T00:00:00+09:00
 draft = false
 description = 'ffmpeg の loudnorm フィルタで LUFS 正規化する方法を解説。1pass/2pass の違い、True Peak、LRA、再エンコード、メタデータ・アートワークの保持まで実例付きでまとめました。'
-tags = ['ffmpeg', 'loudnorm', 'LUFS', 'MP3']
+tags = ['ffmpeg', 'loudnorm', 'LUFS', 'MP3', '音量正規化']
 categories = ['プロジェクト']
 +++
 
@@ -34,10 +34,11 @@ Python から ffmpeg を呼び出してまとめて処理する実装につい�
 - [フィルタチェーンの考え方](#フィルタチェーンの考え方)
 - [実用テンプレート](#実用テンプレート)
 - [まとめ](#まとめ)
+- [関連記事](#関連記事)
 
 ## 前提
 
-- `ffmpeg` 6.x 系が利用できること（導入は [この Qiita 記事](https://qiita.com/Tadataka_Takahashi/items/9dcb0cf308db6f5dc31b) を参考）
+- `ffmpeg` 6.x 系が利用できること（導入は [この Qiita 記事](https://qiita.com/Tadataka_Takahashi/items/9dcb0cf308db6f5dc31b) を参考に）
 - 主な対象は MP3 だが、考え方は AAC / WAV / FLAC でもほぼ同じ
 - コマンド例は PowerShell・bash どちらでも読み替えやすい形で記載
 
