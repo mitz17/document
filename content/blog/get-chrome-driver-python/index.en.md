@@ -24,6 +24,8 @@ This article first explains **how to check the versions of ChromeDriver and Chro
 
 GitHub: [mitz17/get-chrome-driver](https://github.com/mitz17/get-chrome-driver)
 
+> This article reflects information available as of July 2026.
+
 ## How to Check the ChromeDriver Version
 
 ### Windows, Linux, and macOS

@@ -24,6 +24,8 @@ ChromeDriver 150.0.xxxx.xx (...)
 
 GitHub: [mitz17/get-chrome-driver](https://github.com/mitz17/get-chrome-driver)
 
+※この記事の内容は2026年7月時点の情報です。
+
 ## ChromeDriverのバージョンを確認する方法
 
 ### Windows・Linux・macOS共通
