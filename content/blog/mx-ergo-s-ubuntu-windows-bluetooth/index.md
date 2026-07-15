@@ -1,6 +1,6 @@
 +++
 title = 'Easy-Switch対応マウスをUbuntuとWindowsで切り替える｜Bluetooth自動再接続のラグを解消する方法'
-date = 2026-07-16T00:00:00+09:00
+date = 2026-07-15T20:00:00+09:00
 draft = false
 description = 'Easy-Switch対応のロジクールマウス（MX ERGO Sなど）を、Windows は Logi Bolt、Ubuntu は Bluetooth で接続し、切り替えボタンを押した瞬間にラグなく繋がるようにする方法をまとめました。BlueZの自動再接続が不安定になる原因と、systemdユーザーサービスによる解決手順を解説します。'
 tags = ['Ubuntu', 'Bluetooth', 'Easy-Switch', 'BlueZ', 'Logicool']
