@@ -144,4 +144,4 @@ The next step is to actually train on top of this base.
 
 - [Shogi AI in Python: Why You Should Build a GUI First](/en/blog/shogi-GUI/)
 - [Automatically updating ChromeDriver for Selenium](/en/blog/get-chrome-driver-python/)
-- [Building a Python tool to normalize MP3 loudness with LUFS](/en/blog/mp3-lufs-normalizer-python/)
+- [Building a Python tool to normalize MP3 loudness with LUFS](/en/blog/mp3-normalizer-devlog/)

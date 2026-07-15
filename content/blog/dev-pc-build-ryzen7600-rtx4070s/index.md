@@ -123,4 +123,4 @@ HDDとサブSSDは旧構成から持ち越し。新規購入はOS用のM.2 NVMe�
 ## 関連記事
 
 - [Ansysのバージョン選択ツールを作った理由｜古い解析ファイルを別バージョンで開くリスクを減らす](/blog/ansys-version-selector/)
-- [Pythonとffmpegで音量自動調整ツールを作る｜LUFS正規化の開発ログ](/blog/mp3-lufs-normalizer-python/)
+- [Pythonとffmpegで音量自動調整ツールを作る｜LUFS正規化の開発ログ](/blog/mp3-normalizer-devlog/)

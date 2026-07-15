@@ -33,7 +33,10 @@ theme = 'hugo-theme-stack'
     title = "もざぶれなるままに"
 
     [languages.ja.params]
-      description = "自作ツール開発と業務自動化・効率化の実験ログをまとめる技術ブログ"
+      description = "Python・ffmpegで作って試す技術ブログ"
+
+      [languages.ja.params.sidebar]
+        subtitle = "Python・ffmpegで作って試す技術ブログ"
 
     [languages.ja.params.article.share]
       title = "この記事をシェアする"
@@ -74,7 +77,10 @@ theme = 'hugo-theme-stack'
     title = "Mozabre As Idle Moments"
 
     [languages.en.params]
-      description = "A practical tech blog focused on self-made tools, workflow automation, and hands-on software/PC experiments."
+      description = "Hands-On Python & FFmpeg Experiments"
+
+      [languages.en.params.sidebar]
+        subtitle = "Hands-On Python & FFmpeg Experiments"
 
     [languages.en.params.article.share]
       title = "Share this article"

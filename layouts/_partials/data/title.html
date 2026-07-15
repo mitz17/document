@@ -1,0 +1,21 @@
+{{- $pageTitle := .Title -}}
+{{- $siteTitle := .Site.Title -}}
+{{- $paginator := partial "helper/paginator.html" . -}}
+
+{{- $title := slice -}}
+
+{{- if and $paginator $paginator.HasPrev -}}
+    {{ $title = $title | append (printf "Page %d" $paginator.PageNumber) }}
+{{- end -}}
+
+{{- if .IsHome -}}
+    {{- $separator := " | " -}}
+    {{- if eq .Lang "ja" -}}
+        {{- $separator = "｜" -}}
+    {{- end -}}
+    {{- $title = $title | append (printf "%s%s%s" $siteTitle $separator .Site.Params.sidebar.subtitle) -}}
+{{- else -}}
+    {{- $title = $title | append (default $siteTitle $pageTitle) -}}
+{{- end -}}
+
+{{ return delimit $title " - " }}

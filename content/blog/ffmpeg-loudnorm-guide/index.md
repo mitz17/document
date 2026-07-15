@@ -19,7 +19,7 @@ categories = ['プロジェクト']
 - 正規化後に必要な再エンコードの考え方
 - MP3 のタグやアートワークを落とさない方法
 
-Python から ffmpeg を呼び出してまとめて処理する実装については、[音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ](/blog/mp3-lufs-normalizer-python/) を参照してください。
+Python から ffmpeg を呼び出してまとめて処理する実装については、[音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ](/blog/mp3-normalizer-devlog/) を参照してください。
 
 ## 目次
 
@@ -306,9 +306,9 @@ ffmpeg -i input.mp3 \
 | タグ・アートワーク保持 | `-map 0 -map_metadata 0 -c:v copy` をセットで指定 |
 | ツール化するなら | 測定フェーズ（`-f null -`）と本番フェーズを分けて設計 |
 
-Python からまとめて処理したい場合や、CLI で自動化したい場合は [音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ](/blog/mp3-lufs-normalizer-python/) を参照してください。
+Python からまとめて処理したい場合や、CLI で自動化したい場合は [音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ](/blog/mp3-normalizer-devlog/) を参照してください。
 
 ## 関連記事
 
-- [Pythonとffmpegで音量自動調整ツールを作る｜LUFS正規化の開発ログ](/blog/mp3-lufs-normalizer-python/)
+- [Pythonとffmpegで音量自動調整ツールを作る｜LUFS正規化の開発ログ](/blog/mp3-normalizer-devlog/)
 - [Ryzen 7600＋RTX 4070 Superの自作PC構成例｜購入価格16.3万円の実例紹介](/blog/dev-pc-build-ryzen7600-rtx4070s/)

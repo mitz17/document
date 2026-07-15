@@ -137,4 +137,4 @@ MCTS は、候補手を試しながら有望そうな手を重点的に読む探
 
 - [Pythonで将棋AIを作るならまずGUI｜実装した理由と設計](/blog/shogi-GUI/)
 - [Selenium使用時にChromeDriverを自動更新する方法](/blog/get-chrome-driver-python/)
-- [音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ](/blog/mp3-lufs-normalizer-python/)
+- [音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ](/blog/mp3-normalizer-devlog/)

@@ -220,5 +220,5 @@ def terminal_result(position: Position) -> TerminalResult:
 
 - [将棋AIを強化学習前に対局テスト｜MCTSのsimulation数で強さが激変した開発ログ](/blog/shogi-ai-before-training-matchlog/)
 - [Selenium使用時にChromeDriverを自動更新する方法](/blog/get-chrome-driver-python/)
-- [音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ](/blog/mp3-lufs-normalizer-python/)
+- [音楽の音量を自動調整するツールをPythonで作る LUFS正規化開発ログ](/blog/mp3-normalizer-devlog/)
 - [Power Automateで前月分をSharePoint→Excelへ送るときの落とし穴](/blog/power-automate-sharepoint-excel/)

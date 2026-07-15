@@ -190,5 +190,5 @@ Beyond that, I want to find out how much training it takes before the AI becomes
 ## Related Articles
 
 - [Automatically updating ChromeDriver for Selenium](/blog/get-chrome-driver-python/)
-- [Building a Python tool to normalize MP3 loudness with LUFS](/blog/mp3-lufs-normalizer-python/)
+- [Building a Python tool to normalize MP3 loudness with LUFS](/en/blog/mp3-normalizer-devlog/)
 - [Pitfalls when sending last month's SharePoint data to Excel with Power Automate](/blog/power-automate-sharepoint-excel/)
