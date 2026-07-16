@@ -1,4 +1,0 @@
-User-agent: *
-Disallow:
-
-Sitemap: https://mitz17.com/sitemap.xml
