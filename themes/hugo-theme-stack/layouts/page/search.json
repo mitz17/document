@@ -1,6 +1,6 @@
 {{- $pages := partial "helper/pages.html" .Site.Home -}}
 {{- $result := slice -}}
-{{- $defaultImage := resources.Get "images/favicon2.png" -}}
+{{- $defaultImage := resources.Get "images/favicon2.webp" -}}
 
 {{- range $pages -}}
     {{- $data := dict "title" .Title "date" .Date "permalink" .RelPermalink "content" (.Plain) -}}

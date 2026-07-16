@@ -7,10 +7,10 @@ theme = 'hugo-theme-stack'
 
 [params]
   mainSections = ['blog']
-  favicon = "images/favicon2.png"
+  favicon = "images/favicon2.webp"
 
   [params.sidebar]
-    avatar = "images/favicon2.png"
+    avatar = "images/favicon2.webp"
 
   [params.article.share]
     enabled = true
