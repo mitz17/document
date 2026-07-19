@@ -125,5 +125,6 @@ The prices reflect what I paid at the time, so they will differ from current mar
 
 ## Related Posts
 
+- [Ryzen 5 7600 + RTX 4070 SUPER Gaming Benchmarks | Is It Overkill for 1080p?](/en/blog/pc-benchmark/)
 - [Why I Built an Ansys Version Selector Tool | Reducing the Risk of Opening Old Simulation Files in the Wrong Version](/en/blog/ansys-version-selector/)
 - [Python MP3 Volume Normalizer with ffmpeg: How It Works and How to Use It](/en/blog/mp3-normalizer-devlog/)

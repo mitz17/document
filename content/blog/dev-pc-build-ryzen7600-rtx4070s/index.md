@@ -122,5 +122,6 @@ HDDとサブSSDは旧構成から持ち越し。新規購入はOS用のM.2 NVMe�
 
 ## 関連記事
 
+- [Ryzen 5 7600＋RTX 4070 SUPERのゲーム性能を実測｜フルHD環境で性能は過剰か検証](/blog/pc-benchmark/)
 - [Ansysのバージョン選択ツールを作った理由｜古い解析ファイルを別バージョンで開くリスクを減らす](/blog/ansys-version-selector/)
 - [Pythonとffmpegで音量自動調整ツールを作る｜LUFS正規化の開発ログ](/blog/mp3-normalizer-devlog/)
