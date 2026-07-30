@@ -1,5 +1,4 @@
 baseURL = "https://mitz17.com/"
-relativeURLs = true
 languageCode = "ja-jp"
 defaultContentLanguage = 'ja'
 title = "もざぶれなるままに"
