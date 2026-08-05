@@ -8,6 +8,23 @@ tags = ["Python", "Selenium", "ChromeDriver", "Automation", "Web Scraping"]
 categories = ["Projects"]
 +++
 
+## Table of Contents
+
+- [The problem: your scripts stop running whenever Chrome auto-updates](#the-problem-your-scripts-stop-running-whenever-chrome-auto-updates)
+- [Implementation: automating driver retrieval (a quick walkthrough of the code)](#implementation-automating-driver-retrieval-a-quick-walkthrough-of-the-code)
+  - [1. Detect the installed Chrome version](#1-detect-the-installed-chrome-version)
+  - [2. Find the download URL from the Chrome for Testing API](#2-find-the-download-url-from-the-chrome-for-testing-api)
+  - [3. Reuse the saved driver](#3-reuse-the-saved-driver)
+  - [4. Extract only the executable from the ZIP](#4-extract-only-the-executable-from-the-zip)
+  - [5. Verify that it actually starts](#5-verify-that-it-actually-starts)
+- [How to use it](#how-to-use-it)
+  - [0. What you'll need](#0-what-youll-need)
+  - [1. Download](#1-download)
+  - [2. Create a virtual environment](#2-create-a-virtual-environment)
+  - [3. Install the required libraries](#3-install-the-required-libraries)
+  - [4. Call it from your own script](#4-call-it-from-your-own-script)
+- [Wrapping up](#wrapping-up)
+
 ## The problem: your scripts stop running whenever Chrome auto-updates
 
 When Selenium won't start, 99% of the time the cause is a version mismatch between Chrome and ChromeDriver.  
