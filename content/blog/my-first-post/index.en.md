@@ -3,6 +3,7 @@ title = "Welcome to My Tech Blog: What I’ll Write About"
 date = "2026-03-01T11:17:14+09:00"
 draft = false
 description = "Welcome to my tech blog. I’ll share small tools, practical life hacks, and build logs for things I create in everyday development."
+image = "favicon2.webp"
 tags = ["blog"]
 categories = ["announcement"]
 +++
