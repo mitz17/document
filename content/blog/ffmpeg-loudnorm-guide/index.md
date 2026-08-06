@@ -1,6 +1,7 @@
 +++
 title = 'ffmpeg loudnorm の使い方｜LUFS正規化と2pass設定をコマンド例で解説'
 date = 2026-03-08T00:00:00+09:00
+image = 'lufs-reference.png'
 draft = false
 description = 'ffmpeg の loudnorm フィルタで LUFS 正規化する方法を解説。1pass/2pass の違い、True Peak、LRA、再エンコード、メタデータ・アートワークの保持まで実例付きでまとめました。'
 tags = ['ffmpeg', 'loudnorm', 'LUFS', 'MP3', '音量正規化']

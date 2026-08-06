@@ -3,6 +3,7 @@ title = "Creating an Ansys Version Selector to Reduce the Risk of Opening Files 
 date = 2026-03-18T11:00:00+09:00
 draft = false
 description = "An introduction to an unofficial Ansys version selector for environments with multiple Ansys versions installed. It supports Fluent, SpaceClaim, and Workbench."
+image = 'Fluent.png'
 tags = ["Ansys", "Fluent", "Workbench", "SpaceClaim", "Python"]
 categories = ["Projects"]
 slug = "ansys-version-selector"

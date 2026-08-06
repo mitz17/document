@@ -1,6 +1,7 @@
 +++
 title = 'Pythonで将棋AIを作るならまずGUI｜実装した理由と設計'
 date = 2026-03-18T00:00:00+09:00
+image = 'GUI2.png'
 draft = false
 description = 'Pythonで将棋AIを作る際に、強化学習に入る前にGUIを実装した理由を解説。合法手確認や盤面検証、探索結果の可視化など、開発初期で役立つ設計と実装のポイントをまとめました。'
 tags = ['Python', '将棋AI', '強化学習', 'GUI', 'Tkinter']

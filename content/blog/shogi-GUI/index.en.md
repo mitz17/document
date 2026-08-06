@@ -1,6 +1,7 @@
 +++
 title = 'Shogi AI in Python: Why You Should Build a GUI First'
 date = 2026-03-18T00:00:00+09:00
+image = 'GUI2.png'
 draft = false
 description = 'Learn why building a GUI first is essential when developing a Shogi AI in Python. Explore debugging, visualization, and design strategies for early-stage development.'
 tags = ['Python', 'Shogi AI', 'Reinforcement Learning', 'GUI', 'Tkinter']

@@ -3,6 +3,7 @@ title = "Ansysのバージョン選択ツールの作成｜古い解析ファイ
 date = 2026-03-18T11:00:00+09:00
 draft = false
 description = "Ansysを複数バージョン運用している環境で、意図しない版で解析ファイルを開くリスクを減らすために作ったバージョン選択ツールを紹介。Fluent・SpaceClaim・Workbenchに対応。"
+image = 'Fluent.png'
 tags = ["Ansys", "Fluent", "Workbench", "SpaceClaim", "Python"]
 categories = ["プロジェクト"]
 slug = "ansys-version-selector"
