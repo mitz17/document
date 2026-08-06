@@ -38,7 +38,7 @@ ANSYS関連ソフトは俗に言う「**後方互換性はあるが、前方互�
 図のようにプログラムから開くを選択しても、1つのバージョンしか表示されない。`PCでアプリを選択する`を押して、別バージョンのexeファイルを選択しても一覧に表示されないことが多い。  
 表示されたとしても指定したバージョンと別のバージョン(規定のバージョン)で勝手に開かれてしまう。(非常に不思議な仕様である)
 
-<div style="text-align: center;"><img src="windows_select.png" alt="Windowsのアプリ選択画面" width="50%"></div>
+{{< figure src="windows_select.png" alt="Windowsのアプリ選択画面" width="75%" caption="図1　Windowsのアプリ選択画面" >}}
 <p style="text-align: center;">図1　Windowsのアプリ選択画面</p>
 
 そこで、`Fluent`、`SpaceClaim`、`Workbench` を「**どのバージョンで開くか**」を**明示的に選べる**ツールをつくった。
@@ -52,11 +52,11 @@ ANSYS関連ソフトは俗に言う「**後方互換性はあるが、前方互�
 5. 下図のようなGUIが開く。入力ファイルに開きたいファイルが表示されていることを確認する
 6. 自動でバージョンを検出するので、開きたいバージョンを選択して起動ボタンを押す
 
-<div style="text-align: center;"><img src="SCDM.png" alt="SpaceClaim バージョン選択ツールの画面" width="75%"></div>
+{{< figure src="SCDM.png" alt="SpaceClaim バージョン選択ツールの画面" width="75%" caption="図2　SpaceClaimのバージョン選択画面" >}}
 <p style="text-align: center;">図2　SpaceClaimのバージョン選択画面</p>
 
 
-<div style="text-align: center;"><img src="WB.png" alt="Workbench バージョン選択ツールの画面" width="75%"></div>
+{{< figure src="WB.png" alt="Workbench バージョン選択ツールの画面" width="75%" caption="図3　Workbenchのバージョン選択画面" >}}
 <p style="text-align: center;">図3　Workbenchのバージョン選択画面</p>
 
 Fluent のみ
@@ -70,7 +70,7 @@ Fluent のみ
 「Fluent Launcherを起動」ボタンも用意している。
 
 
-<div style="text-align: center;"><img src="Fluent.png" alt="Fluent バージョン選択ツールの画面" width="75%"></div>
+{{< figure src="Fluent.png" alt="Fluent バージョン選択ツールの画面" width="75%" caption="図4　Fluentのバージョン選択画面" >}}
 <p style="text-align: center;">図4　Fluentのバージョン選択画面</p>
 
 なお、UIの改善には[emilkowalski/skills](https://github.com/emilkowalski/skills) のUI設計を使用した。
@@ -96,7 +96,7 @@ C:\\Program Files\\ANSYS Inc にANSYSをインストールしている場合、�
 }
 ```
 
-<div style="text-align: center;"><img src="version_set.png" alt="バージョン設定ダイアログ" width="60%"></div>
+{{< figure src="version_set.png" alt="バージョン設定ダイアログ" width="75%" caption="図5　バージョン設定ダイアログ" >}}
 <p style="text-align: center;">図5　バージョン設定ダイアログ</p>
 
 ## コードの解説
