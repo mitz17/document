@@ -2,31 +2,15 @@
 title = "Ansysのバージョン選択ツールの作成｜古い解析ファイルを別バージョンで開くリスクを減らす"
 date = 2026-03-18T11:00:00+09:00
 draft = false
-description = "Ansysを複数バージョン運用している環境で、意図しない版で解析ファイルを開くリスクを減らすために作った非公式のバージョン選択ツールを紹介。Fluent・SpaceClaim・Workbenchに対応し、起動前に版を明示的に選べる。"
+description = "Ansysを複数バージョン運用している環境で、意図しない版で解析ファイルを開くリスクを減らすために作ったバージョン選択ツールを紹介。Fluent・SpaceClaim・Workbenchに対応。"
 tags = ["Ansys", "Fluent", "Workbench", "SpaceClaim", "Python"]
 categories = ["プロジェクト"]
 slug = "ansys-version-selector"
 +++
 
-GitHub: [mitz17/ANSYS_Version_Selector](https://github.com/mitz17/ANSYS_Version_Selector)
-
-このツールは GitHub で公開している。
-
+GitHub: [mitz17/ANSYS_Version_Selector](https://github.com/mitz17/ANSYS_Version_Selector)  
+このツールは GitHub で公開している。  
 この記事で紹介するツールは個人が作成した非公式ツールであり、Ansys の公式製品・公式サポートとは一切無関係である。
-
-## 作った理由
-
-私のPCには、ANSYS関連ソフト(Fluent、SpaceClaim、Workbench) が複数バージョンインストールされている。
-
-ANSYS関連ソフトは俗に言う**「後方互換性はあるが、前方互換性はない」**仕様となっている。  
-新しいバージョンのソフトでは古いファイルを読めるが、新しいソフトで保存したファイルは古いバージョンのソフトで読むことはできない。
-だから、ANSYSファイルを開いたり上書き保存するときには細心の注意を払う必要がある。(n敗)
-
-しかし、ANSYSとWindows標準の機能のみでは、好きなバージョンを選択してファイルを開くことは難しい。(少なくとも私の環境では。)  
-図のようにプログラムから開くを選択しても、1つのバージョンしか表示されない。`PCでアプリを選択する`を押して、別バージョンのexeファイルを選択しても一覧に表示されないことが多い。  
-表示されたとしても指定したバージョンと別のバージョン(規定のバージョン)で勝手に開かれてしまう。(非常に不思議な仕様である)
-
-そこで、`Fluent`、`SpaceClaim`、`Workbench` を「どのバージョンで開くか」を毎回明示的に選べるツールをつくった。
 
 ## 目次
 
@@ -40,6 +24,24 @@ ANSYS関連ソフトは俗に言う**「後方互換性はあるが、前方互�
 - [さいごに](#さいごに)
 - [関連記事](#関連記事)
 
+
+## 作った理由
+
+私のPCには、ANSYS関連ソフト(Fluent、SpaceClaim、Workbench) が**複数バージョンインストールされている**。
+
+ANSYS関連ソフトは俗に言う「**後方互換性はあるが、前方互換性はない**」仕様となっている。  
+新しいバージョンのソフトでは古いファイルを読めるが、新しいソフトで保存したファイルは古いバージョンのソフトで読むことはできない。  
+だから、ANSYSファイルを開いたり上書き保存するときには細心の注意を払う必要がある。(n敗)
+
+しかし、ANSYSとWindows標準の機能のみでは、好きなバージョンを選択してファイルを開くことは難しい。(少なくとも私の環境では)  
+図のようにプログラムから開くを選択しても、1つのバージョンしか表示されない。`PCでアプリを選択する`を押して、別バージョンのexeファイルを選択しても一覧に表示されないことが多い。  
+表示されたとしても指定したバージョンと別のバージョン(規定のバージョン)で勝手に開かれてしまう。(非常に不思議な仕様である)
+
+<div style="text-align: center;"><img src="windows_select.png" alt="Windowsのアプリ選択画面" width="50%"></div>
+<p style="text-align: center;">図1　Windowsのアプリ選択画面</p>
+
+そこで、`Fluent`、`SpaceClaim`、`Workbench` を「**どのバージョンで開くか**」を**明示的に選べる**ツールをつくった。
+
 ## ツールの使い方
 
 1. [GitHub](https://github.com/mitz17/ANSYS_Version_Selector)のリリースのページから最新版のexeファイル一式をダウンロードする（ソースコードから自分でexe化してもよい）
@@ -49,9 +51,12 @@ ANSYS関連ソフトは俗に言う**「後方互換性はあるが、前方互�
 5. 下図のようなGUIが開く。入力ファイルに開きたいファイルが表示されていることを確認する
 6. 自動でバージョンを検出するので、開きたいバージョンを選択して起動ボタンを押す
 
-![SpaceClaim バージョン選択ツールの画面](SCDM.png)
+<div style="text-align: center;"><img src="SCDM.png" alt="SpaceClaim バージョン選択ツールの画面" width="75%"></div>
+<p style="text-align: center;">図2　SpaceClaimのバージョン選択画面</p>
 
-![Workbench バージョン選択ツールの画面](WB.png)
+
+<div style="text-align: center;"><img src="WB.png" alt="Workbench バージョン選択ツールの画面" width="75%"></div>
+<p style="text-align: center;">図3　Workbenchのバージョン選択画面</p>
 
 Fluent のみ
 
@@ -64,16 +69,18 @@ Fluent のみ
 「Fluent Launcherを起動」ボタンも用意している。
 
 
-![Fluent バージョン選択ツールの画面](Fluent.png)
+<div style="text-align: center;"><img src="Fluent.png" alt="Fluent バージョン選択ツールの画面" width="75%"></div>
+<p style="text-align: center;">図4　Fluentのバージョン選択画面</p>
+
+なお、UIの改善には[emilkowalski/skills](https://github.com/emilkowalski/skills) のUI設計を使用した。
 
 ### バージョンの手動検出
 
 C:\\Program Files\\ANSYS Inc にANSYSをインストールしている場合、自動でバージョンを検出する。
-上記以外の場所にインストールしている場合は、手動で追加することができる。
+上記以外の場所にインストールしている場合は、**手動で追加することができる**。
 設定ボタンを押して、バージョン名と実行ファイルパスを入力する。
 
 例)
-(画像を表示)
 
 また、追加・更新・削除だけでなく、`上へ` / `下へ` ボタンで並び順も変更できるようにしてある。
 
@@ -88,7 +95,8 @@ C:\\Program Files\\ANSYS Inc にANSYSをインストールしている場合、�
 }
 ```
 
-![バージョン設定ダイアログ](version_set.png)
+<div style="text-align: center;"><img src="version_set.png" alt="バージョン設定ダイアログ" width="60%"></div>
+<p style="text-align: center;">図5　バージョン設定ダイアログ</p>
 
 ## コードの解説
 
@@ -197,8 +205,8 @@ Fluentのみ読み込むファイルの種類によって処理を変える必�
 
 というように、起動時に流すジャーナルを変えている。
 
-親プロセス側でジャーナルをすぐ消してしまうと、Fluent 側の読み込みタイミング次第で失敗する可能性があるため、一時 `.jou` は即削除しない設計にした。  
-代わりに、48 時間以上古いランチャー由来のジャーナルを次回起動時に掃除するようにしている。
+親プロセス側でジャーナルをすぐ消してしまうと、Fluent 側の読み込みタイミング次第で失敗する可能性があるため、**一時 `.jou` は即削除しない**設計にした。  
+代わりに、**48 時間以上古いランチャー由来のジャーナルを次回起動時に掃除**するようにしている。
 
 ## さいごに
 
