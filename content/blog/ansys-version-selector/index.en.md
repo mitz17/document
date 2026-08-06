@@ -23,7 +23,7 @@ Ansys software is commonly described as having **backward compatibility but no f
 
 However, using only Ansys and standard Windows features, it is difficult to choose which version should open a file. Even when another executable is selected through “Open with,” the file may still be opened by the default version.
 
-{{< figure src="windows_select.png" alt="Windows app selection dialog" width="75%" caption="Figure 1. Windows app selection dialog" >}}
+<div style="text-align: center;"><img src="windows_select.png" alt="Windows app selection dialog" width="75%"></div>
 <p style="text-align: center;">Figure 1. Windows app selection dialog</p>
 
 I created this tool so that users can explicitly choose **which version to use** each time they open a Fluent, SpaceClaim, or Workbench file.
@@ -37,10 +37,10 @@ I created this tool so that users can explicitly choose **which version to use**
 5. Confirm that the file you want to open is displayed in the GUI.
 6. The tool **automatically detects the installed versions**. Select the version you want and click the launch button.
 
-{{< figure src="SCDM.png" alt="SpaceClaim version selector" width="75%" caption="Figure 2. SpaceClaim version selector" >}}
+<div style="text-align: center;"><img src="SCDM.png" alt="SpaceClaim version selector" width="75%"></div>
 <p style="text-align: center;">Figure 2. SpaceClaim version selector</p>
 
-{{< figure src="WB.png" alt="Workbench version selector" width="75%" caption="Figure 3. Workbench version selector" >}}
+<div style="text-align: center;"><img src="WB.png" alt="Workbench version selector" width="75%"></div>
 <p style="text-align: center;">Figure 3. Workbench version selector</p>
 
 Fluent only
@@ -52,7 +52,7 @@ Fluent only
 
 The tool also provides a “Launch Fluent Launcher” button.
 
-{{< figure src="Fluent.png" alt="Fluent version selector" width="75%" caption="Figure 4. Fluent version selector" >}}
+<div style="text-align: center;"><img src="Fluent.png" alt="Fluent version selector" width="75%"></div>
 <p style="text-align: center;">Figure 4. Fluent version selector</p>
 
 The UI improvement was performed with the help of AI, using the UI design and animation guidance from [emilkowalski/skills](https://github.com/emilkowalski/skills) as a reference.
@@ -75,7 +75,7 @@ For example, Fluent may save the following configuration:
 }
 ```
 
-{{< figure src="version_set.png" alt="Version settings dialog" width="75%" caption="Figure 5. Version settings dialog" >}}
+<div style="text-align: center;"><img src="version_set.png" alt="Version settings dialog" width="75%"></div>
 <p style="text-align: center;">Figure 5. Version settings dialog</p>
 
 ## Code overview

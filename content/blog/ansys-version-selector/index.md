@@ -38,13 +38,12 @@ ANSYS関連ソフトは俗に言う「**後方互換性はあるが、前方互�
 図のようにプログラムから開くを選択しても、1つのバージョンしか表示されない。`PCでアプリを選択する`を押して、別バージョンのexeファイルを選択しても一覧に表示されないことが多い。  
 表示されたとしても指定したバージョンと別のバージョン(規定のバージョン)で勝手に開かれてしまう。(非常に不思議な仕様である)
 
-{{< figure src="windows_select.png" alt="Windowsのアプリ選択画面" width="75%" caption="図1　Windowsのアプリ選択画面" >}}
+<div style="text-align: center;"><img src="windows_select.png" alt="Windowsのアプリ選択画面" width="50%"></div>
 <p style="text-align: center;">図1　Windowsのアプリ選択画面</p>
 
 そこで、`Fluent`、`SpaceClaim`、`Workbench` を「**どのバージョンで開くか**」を**明示的に選べる**ツールをつくった。
 
 ## ツールの使い方
-
 1. [GitHub](https://github.com/mitz17/ANSYS_Version_Selector)のリリースのページから最新版のexeファイル一式をダウンロードする（ソースコードから自分でexe化してもよい）
 2. 好きな場所に保存する（例: C:\CombinedAnsysLauncher 直下）
 3. ANSYSファイルの拡張子をFluentVersionSelector.exe、SpaceClaimVersionSelector.exe、WorkbenchVersionSelector.exeのどれかに関連付けてwindowsの規定で開くように設定する
@@ -52,11 +51,11 @@ ANSYS関連ソフトは俗に言う「**後方互換性はあるが、前方互�
 5. 下図のようなGUIが開く。入力ファイルに開きたいファイルが表示されていることを確認する
 6. 自動でバージョンを検出するので、開きたいバージョンを選択して起動ボタンを押す
 
-{{< figure src="SCDM.png" alt="SpaceClaim バージョン選択ツールの画面" width="75%" caption="図2　SpaceClaimのバージョン選択画面" >}}
+<div style="text-align: center;"><img src="SCDM.png" alt="SpaceClaim バージョン選択ツールの画面" width="75%"></div>
 <p style="text-align: center;">図2　SpaceClaimのバージョン選択画面</p>
 
 
-{{< figure src="WB.png" alt="Workbench バージョン選択ツールの画面" width="75%" caption="図3　Workbenchのバージョン選択画面" >}}
+<div style="text-align: center;"><img src="WB.png" alt="Workbench バージョン選択ツールの画面" width="75%"></div>
 <p style="text-align: center;">図3　Workbenchのバージョン選択画面</p>
 
 Fluent のみ
@@ -70,7 +69,7 @@ Fluent のみ
 「Fluent Launcherを起動」ボタンも用意している。
 
 
-{{< figure src="Fluent.png" alt="Fluent バージョン選択ツールの画面" width="75%" caption="図4　Fluentのバージョン選択画面" >}}
+<div style="text-align: center;"><img src="Fluent.png" alt="Fluent バージョン選択ツールの画面" width="75%"></div>
 <p style="text-align: center;">図4　Fluentのバージョン選択画面</p>
 
 なお、UIの改善には[emilkowalski/skills](https://github.com/emilkowalski/skills) のUI設計を使用した。
@@ -80,8 +79,6 @@ Fluent のみ
 C:\\Program Files\\ANSYS Inc にANSYSをインストールしている場合、自動でバージョンを検出する。
 上記以外の場所にインストールしている場合は、**手動で追加することができる**。
 設定ボタンを押して、バージョン名と実行ファイルパスを入力する。
-
-例)
 
 また、追加・更新・削除だけでなく、`上へ` / `下へ` ボタンで並び順も変更できるようにしてある。
 
@@ -96,7 +93,7 @@ C:\\Program Files\\ANSYS Inc にANSYSをインストールしている場合、�
 }
 ```
 
-{{< figure src="version_set.png" alt="バージョン設定ダイアログ" width="75%" caption="図5　バージョン設定ダイアログ" >}}
+<div style="text-align: center;"><img src="version_set.png" alt="バージョン設定ダイアログ" width="100%"></div>
 <p style="text-align: center;">図5　バージョン設定ダイアログ</p>
 
 ## コードの解説
