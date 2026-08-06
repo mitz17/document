@@ -93,7 +93,7 @@ C:\\Program Files\\ANSYS Inc にANSYSをインストールしている場合、�
 }
 ```
 
-<div style="text-align: center;"><img src="version_set.png" alt="バージョン設定ダイアログ" width="100%"></div>
+<div style="text-align: center;"><img src="version_set.png" alt="バージョン設定ダイアログ" width="75%"></div>
 <p style="text-align: center;">図5　バージョン設定ダイアログ</p>
 
 ## コードの解説
